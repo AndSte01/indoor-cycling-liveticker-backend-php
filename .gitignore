@@ -1,0 +1,9 @@
+# generated documentation
+/phpdoc
+/.phpdoc
+
+# vscode settings
+/.vscode
+
+# legcy code
+/legacy

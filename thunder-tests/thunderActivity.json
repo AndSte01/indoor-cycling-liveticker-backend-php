@@ -1,0 +1,410 @@
+[
+  {
+    "_id": "bf548663-6a9b-4352-9f27-08baf26fa01f",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}",
+    "url": "http://{{base_url}}",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:22:45.549Z",
+    "modified": "2022-04-22T12:22:45.627Z",
+    "headers": [],
+    "params": [],
+    "tests": []
+  },
+  {
+    "_id": "3378c691-447e-40b9-9ecd-ebfbdd86ae73",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}/{{kwd_competition}}.php",
+    "url": "http://{{base_url}}/{{kwd_competition}}.php",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:23:04.355Z",
+    "modified": "2022-04-22T12:23:04.364Z",
+    "headers": [],
+    "params": [],
+    "tests": []
+  },
+  {
+    "_id": "3b6477a0-a640-4aac-8431-8bcf26fb8fb5",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}/{{kwd_discipline}}.php",
+    "url": "http://{{base_url}}/{{kwd_discipline}}.php",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:23:14.724Z",
+    "modified": "2022-04-22T12:40:06.725Z",
+    "headers": [],
+    "params": [],
+    "tests": []
+  },
+  {
+    "_id": "40b9461e-03ee-4c84-9968-6197be710bfd",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1",
+    "url": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:23:57.319Z",
+    "modified": "2022-04-22T12:31:41.688Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "competition",
+        "value": "1",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "2a658653-f87b-4415-8269-a35473fccc69",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}/{{kwd_discipline}}.php?competition=hi",
+    "url": "http://{{base_url}}/{{kwd_discipline}}.php?competition=hi",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:36:18.834Z",
+    "modified": "2022-04-22T12:36:32.139Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "competition",
+        "value": "hi",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "MISSING_INFORMATION"
+      }
+    ]
+  },
+  {
+    "_id": "3686a5e1-7e8c-4b4d-bf7e-7aef622feab9",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}/{{kwd_discipline}}.php?competition=0",
+    "url": "http://{{base_url}}/{{kwd_discipline}}.php?competition=0",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:37:07.653Z",
+    "modified": "2022-04-22T12:37:07.658Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "competition",
+        "value": "0",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "PARAM_OUT_OF_RANGE"
+      }
+    ]
+  },
+  {
+    "_id": "7d2c1a95-9d46-425c-94f5-c5dc37072210",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1000000000",
+    "url": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1000000000",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:39:13.761Z",
+    "modified": "2022-04-22T12:39:30.025Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "competition",
+        "value": "1000000000",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "3ac165c9-62c8-4e31-973e-859a6f51cf71",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1&timestamp=0",
+    "url": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1&timestamp=0",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:40:53.694Z",
+    "modified": "2022-04-22T12:41:07.495Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "competition",
+        "value": "1",
+        "isPath": false
+      },
+      {
+        "name": "timestamp",
+        "value": "0",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "6aae5b06-e38b-4a2c-b923-76542d7cd211",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1&timestamp=dsf",
+    "url": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1&timestamp=dsf",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:41:19.145Z",
+    "modified": "2022-04-22T12:42:15.083Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "competition",
+        "value": "1",
+        "isPath": false
+      },
+      {
+        "name": "timestamp",
+        "value": "dsf",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "NaN"
+      }
+    ]
+  },
+  {
+    "_id": "33dc9e78-980f-47c6-aea5-237524a1c193",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1&timestamp=4294967296",
+    "url": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1&timestamp=4294967296",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:45:25.778Z",
+    "modified": "2022-04-22T12:45:40.309Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "competition",
+        "value": "1",
+        "isPath": false
+      },
+      {
+        "name": "timestamp",
+        "value": "4294967296",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "1daa49fc-c4c2-49bb-84a1-1dad50cf9966",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1&method=hi",
+    "url": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1&method=hi",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:47:49.909Z",
+    "modified": "2022-04-22T12:48:33.710Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "competition",
+        "value": "1",
+        "isPath": false
+      },
+      {
+        "name": "method",
+        "value": "hi",
+        "isPath": false
+      }
+    ],
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "andreas",
+        "password": "steger"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "PARAM_OUT_OF_RANGE"
+      }
+    ]
+  },
+  {
+    "_id": "a0aad5fd-b1af-4758-8bb3-04d0661c73d1",
+    "colId": "history",
+    "containerId": "",
+    "name": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1&method=add",
+    "url": "http://{{base_url}}/{{kwd_discipline}}.php?competition=1&method=add",
+    "method": "GET",
+    "sortNum": 0,
+    "created": "2022-04-22T12:48:44.294Z",
+    "modified": "2022-04-22T12:48:44.301Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "competition",
+        "value": "1",
+        "isPath": false
+      },
+      {
+        "name": "method",
+        "value": "add",
+        "isPath": false
+      }
+    ],
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "andreas",
+        "password": "steger"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "PARAM_OUT_OF_RANGE"
+      }
+    ]
+  }
+]
