@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Add, Update and get competitions via the internet
+ * Add, Update and get users via the internet
  * 
- * The script to add, update and get competitions from the web.
+ * The script to add, update and get users from the web.
  * 
  * @package IO
  */

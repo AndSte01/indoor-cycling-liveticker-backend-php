@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Add, edit, remove and get competitions via the internet
+ * Add, edit, remove and get disciplines via the internet
  * 
- * The script to add, edit, remove and get competitions from the web.
+ * The script to add, edit, remove and get disciplines from the web.
  * 
  * @package IO
  */
