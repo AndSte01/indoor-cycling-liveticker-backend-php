@@ -19,7 +19,6 @@ require_once("db_adapter_interface.php");
 require_once(dirname(__FILE__) . "/../representatives/db_representatives_result.php");
 
 // define aliases
-
 use DateTime;
 use mysqli;
 
@@ -28,7 +27,7 @@ class adapterResult implements AdapterInterface
     /**
      * @param ?int $results Id of the result to search for
      * @param ?array $discipline_id Id of the disciplines whose results should be returned
-     * @param ?DateTime $modifiedSince Get disciplines that were modified after the time passed
+     * @param ?DateTime $modifiedSince Get results that were modified after the time passed
      * @param ?int $start_number The start number of the competitor
      * @param ?string $name The name of the competitor
      * @param ?string $club The club of the competitor
@@ -132,7 +131,79 @@ class adapterResult implements AdapterInterface
         // bind result values to statement
         $statement->bind_result($_1, $_2, $_3, $_4, $_5, $_6, $_7, $_8, $_9, $_10);
 
-        // iterate over (msql) results
+        // iterate over results
+        while ($statement->fetch()) {
+            $entry = new result();
+            $entry->parse($_1, $_2, $_3, $_4, $_5, $_6, $_7, $_8, $_9, $_10, $db);
+
+            // append to list
+            $return[] = $entry;
+        }
+
+        // return array of results
+        return $return;
+    }
+
+    /**
+     * Searches for results in the database by a competition id (timestamp for deltas is supported)
+     * 
+     * This function searches for results by multiple discipline id's which are acquired by doing a nested search for the disciplines linked to the
+     * competition id. This is all done with a single MySQL statement:
+     * `SELECT fields FROM results WHERE competitions.id IN (SELECT id FROM competitions WHERE id=?) AND timestamp >=?`
+     * 
+     * @param mysqli $db The database to work with
+     * @param int $competition_id The id of the competition the desired results are indirectly (via disciplines) assigned to.
+     * @param ?DateTime $modified_since Get results that were modified after the time passed
+     * 
+     * @return results[] The results that were found
+     */
+    public static function searchByCompetition(
+        mysqli $db,
+        int $competition_id,
+        ?DateTime $modified_since = null,
+    ): array {
+        // empty return
+        $return = [];
+
+        // empty timestamp filter
+        $timestamp =  "";
+
+        // parameters
+        $parameters = [$competition_id];
+
+        // check if addititonal filter for timestamp should be added
+        if ($modified_since != null) {
+            $timestamp = " AND " . db_kwd::RESULT_TIMESTAMP . ">=?";
+            $parameters[] = $modified_since->format('Y-m-d H:i:s');
+        }
+
+        // SELECT fields FROM results WHERE competitions.id IN (SELECT id FROM competitions WHERE id=?)
+        // Create SQL query
+        $statement = $db->prepare("SELECT " . implode(", ", [
+            db_kwd::RESULT_ID,
+            db_kwd::RESULT_TIMESTAMP,
+            db_kwd::RESULT_DISCIPLINE,
+            db_kwd::RESULT_START_NUMBER,
+            db_kwd::RESULT_NAME,
+            db_kwd::RESULT_CLUB,
+            db_kwd::RESULT_SCORE_SUBMITTED,
+            db_kwd::RESULT_SCORE_ACCOMPLISHED,
+            db_kwd::RESULT_TIME,
+            db_kwd::RESULT_FINISHED
+        ]) .
+            " FROM " . db_config::TABLE_RESULT .
+            " WHERE " . db_kwd::RESULT_DISCIPLINE . " IN (" .
+            // now do nested search for discipline id's
+            "SELECT " . db_kwd::DISCIPLINE_ID . " FROM " . db_config::TABLE_DISCIPLINE . " WHERE " . db_kwd::DISCIPLINE_COMPETITION . "=?" .
+            ")$timestamp;");
+
+        // execute statement
+        $statement->execute($parameters);
+
+        // bind result values to statement
+        $statement->bind_result($_1, $_2, $_3, $_4, $_5, $_6, $_7, $_8, $_9, $_10);
+
+        // iterate over results
         while ($statement->fetch()) {
             $entry = new result();
             $entry->parse($_1, $_2, $_3, $_4, $_5, $_6, $_7, $_8, $_9, $_10, $db);
