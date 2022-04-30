@@ -228,4 +228,33 @@ class adapterGeneric
         // return the mysql server time as DateTime object
         return $time;
     }
+
+    /**
+     * Cleans database by searching for elements that lack a parent and removing it.
+     * 
+     * In the best case no elements are removed (given $strict = false),
+     * this means that the code works fine and the cleaning tasks in the adapters do their job correctly.
+     * Please note the action is quiet intense for the database, so only run it if it is required.
+     * 
+     * @param mysqli $db The database to clean
+     * @param bool $strict true: remove competitions whose users got deleted (and also delete all competitions with user=0)
+     *                     false: assign user 0 to all competitions where the user got deleted
+     * 
+     * @return array The deleted elements (only id's)
+     * 
+     * @todo implement
+     */
+    /*public static function cleanDatabase(mysqli $db, bool $strict = false): array
+    {
+        // don't store any id's in this script do it entirely with query's (if the database get's big memory problems might occur)
+
+        // do optimization
+        https://forums.mysql.com/read.php?28,247289,249191#msg-249191
+        
+        // do deletion with join
+        https://dev.mysql.com/doc/refman/8.0/en/delete.html
+        https://stackoverflow.com/questions/17083862/mysql-delete-row-where-parent-does-not-exist
+
+        return [];
+    }*/
 }
