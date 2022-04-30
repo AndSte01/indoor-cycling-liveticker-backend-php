@@ -7,8 +7,7 @@
  */
 
 // define aliases
-use function db\connect;
-use function db\createTables;
+use db\adapterGeneric;
 
 // Error logging
 // ini_set('display_errors', 1);
@@ -18,7 +17,7 @@ use function db\createTables;
 require_once("db/adapter/db_adapter_generic.php");
 
 // connect to database and create tables
-createTables($db = connect());
+adapterGeneric::createTables($db = adapterGeneric::connect());
 
 // disconnect form database
 $db->close();

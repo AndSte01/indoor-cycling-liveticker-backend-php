@@ -19,7 +19,7 @@ use managerAuthentication;
 use managerCompetition;
 use managerUser;
 use mysqli;
-use function db\connect;
+use db\adapterGeneric;
 use function db\utils\authenticationErrorsToString;
 use function db\utils\competitionErrorsToString;
 
@@ -76,7 +76,7 @@ if (!in_array($param_method, ["add", "edit", "remove"]))
 // all available methods require authentication and a user management so initiate that
 
 // connect to database
-$db = connect();
+$db = adapterGeneric::connect();
 
 // create user manager and authentication manager
 $user_manager = new managerUser($db);
@@ -157,7 +157,7 @@ function getCompetitionsGeneric($daysSinceToday, $limit): string
     // work with the competition manager to get the competitions
 
     // connect to database
-    $db = connect();
+    $db = adapterGeneric::connect();
 
     // create competition manager
     $competition_manager = new managerCompetition($db);
@@ -193,7 +193,7 @@ function getCompetitionsId($id): string
     }
 
     // connect to database
-    $db = connect();
+    $db = adapterGeneric::connect();
 
     // create competition manager
     $competition_manager = new managerCompetition($db);

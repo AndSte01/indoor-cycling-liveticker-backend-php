@@ -12,11 +12,10 @@
 namespace IO\user;
 
 // define aliases
-use db\user;
 use errors;
 use managerAuthentication;
 use managerUser;
-use function db\connect;
+use db\adapterGeneric;
 use function db\utils\authenticationErrorsToString;
 use function db\utils\parseVerifyUser;
 use function db\utils\userErrorsToString;
@@ -51,7 +50,7 @@ if (!in_array($param_method, [null, "add", "edit", "remove", "logout"]))
     die(errors::to_error_string([errors::PARAM_OUT_OF_RANGE]));
 
 // connect to the database
-$db = connect();
+$db = adapterGeneric::connect();
 
 // if the client wants to add a user no authentication is required
 if ($param_method == "add") {

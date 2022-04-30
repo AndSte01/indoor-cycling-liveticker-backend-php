@@ -21,8 +21,7 @@ use managerCompetition;
 use managerDiscipline;
 use managerUser;
 use mysqli;
-use function db\connect;
-use function db\getCurrentTime;
+use db\adapterGeneric;
 use function db\utils\authenticationErrorsToString;
 use function db\utils\competitionErrorsToString;
 
@@ -82,7 +81,7 @@ if (!in_array($param_method, ["add", "edit", "remove"]))
 // all available methods require authentication and a user management so initiate that
 
 // connect to database
-$db = connect();
+$db = adapterGeneric::connect();
 
 // create user manager and authentication manager
 $user_manager = new managerUser($db);
@@ -138,13 +137,13 @@ function getDisciplines($competition_id, $timestamp): string
     // work with the discipline manager to get the disciplines
 
     // connect to database
-    $db = connect();
+    $db = adapterGeneric::connect();
 
     // create discipline manager
     $discipline_manager = new managerDiscipline($db, $competition_id);
 
     // get current timestamp from database (it is important to get it before asking for disciplines)
-    $new_timestamp = getCurrentTime($db)->getTimestamp();
+    $new_timestamp =  adapterGeneric::getCurrentTime($db)->getTimestamp();
 
     // decide what to do
     switch (true) {

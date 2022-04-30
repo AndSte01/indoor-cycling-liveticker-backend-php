@@ -75,150 +75,157 @@ use mysqli;
 require_once(dirname(__FILE__) . "/../db_config.php");
 
 /**
- * Connect to database configured in db_config.php
- * 
- * @return mysqli database the function connected to
+ * A collection of generic functions used to interact with the database 
  */
-function connect(): mysqli
+class adapterGeneric
 {
-    $db = mysqli_connect(db_config::HOST, db_config::USER, db_config::PASSWORD, db_config::NAME) or die(mysqli_connect_errno());
-    return $db;
-}
 
-/**
- * Disconnect form database passed as parameter
- * 
- * @param mysqli $db database to disconnect
- * 
- * @deprecated use $db->close() directly
- */
-function disconnect(mysqli $db): void
-{
-    $db->close();
+    /**
+     * Connect to database configured in db_config.php
+     * 
+     * @return mysqli database the function connected to
+     */
+    public static function connect(): mysqli
+    {
+        $db = mysqli_connect(db_config::HOST, db_config::USER, db_config::PASSWORD, db_config::NAME) or die(mysqli_connect_errno());
+        return $db;
+    }
 
-    error_log("don't use disconnect() use \$db->close() instead;");
-}
+    /**
+     * Disconnect form database passed as parameter
+     * 
+     * @param mysqli $db database to disconnect
+     * 
+     * @deprecated use $db->close() directly
+     */
+    public static function disconnect(mysqli $db): void
+    {
+        $db->close();
 
-
-/**
- * Sets up the tables of the database
- * 
- * @param mysqli $db Database in which tables are created
- * @return string|null error message
- * 
- * @todo php 8: make use of union type for return
- */
-function createTables(mysqli $db): string
-{
-    // --- User Table ---
-
-    // make query for TABLE_USER
-    $query  = "create table IF NOT EXISTS " . db_config::TABLE_USER . " ( ";
-    $query .= db_kwd::USER_ID .          " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";  // Id of the user
-    $query .= db_kwd::USER_NAME .        " text NOT NULL, ";                            // Username
-    $query .= db_kwd::USER_PASSWORD .    " text NOT NULL, ";                            // Password
-    $query .= db_kwd::USER_ROLE .        " INT NOT NULL)";                              // Role
-
-    // execute query and do error handling
-    if ($db->query($query) != true) {
-        return "couldn't create table '" . db_config::TABLE_USER . "': " . $db->error;
+        error_log("don't use disconnect() use \$db->close() instead;");
     }
 
 
-    // --- Competition Table ---
+    /**
+     * Sets up the tables of the database
+     * 
+     * @param mysqli $db Database in which tables are created
+     * @return string|null error message
+     * 
+     * @todo php 8: make use of union type for return
+     */
+    public static function createTables(mysqli $db): string
+    {
+        // --- User Table ---
 
-    // make query for TABLE_COMPETITION
-    $query  = "create table IF NOT EXISTS " . db_config::TABLE_COMPETITION . " ( ";
-    $query .= db_kwd::COMPETITION_ID .          " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";  // Id of Competition
-    $query .= db_kwd::COMPETITION_DATE .        " date NOT NULL DEFAULT (CURRENT_DATE()), ";   // Date of competition  // WARN requires MySQL >8.0.13
-    $query .= db_kwd::COMPETITION_NAME .        " text, ";
-    $query .= db_kwd::COMPETITION_LOCATION .    " text, ";
-    $query .= db_kwd::COMPETITION_USER .        " int NOT NULL, ";
-    $query .= db_kwd::COMPETITION_AREAS .       " TINYINT(1) NOT NULL DEFAULT 0, ";
-    $query .= db_kwd::COMPETITION_FEATURE_SET . " TINYINT(1) NOT NULL DEFAULT 0, ";
-    $query .= db_kwd::COMPETITION_LIVE .        " TINYINT(1) NOT NULL DEFAULT 0)";             // 0 isn't Live, 1 is Live
+        // make query for TABLE_USER
+        $query  = "create table IF NOT EXISTS " . db_config::TABLE_USER . " ( ";
+        $query .= db_kwd::USER_ID .          " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";  // Id of the user
+        $query .= db_kwd::USER_NAME .        " text NOT NULL, ";                            // Username
+        $query .= db_kwd::USER_PASSWORD .    " text NOT NULL, ";                            // Password
+        $query .= db_kwd::USER_ROLE .        " INT NOT NULL)";                              // Role
 
-    // execute query and do error handling
-    if ($db->query($query) != true) {
-        return "couldn't create table '" . db_config::TABLE_COMPETITION . "': " . $db->error;
+        // execute query and do error handling
+        if ($db->query($query) != true) {
+            return "couldn't create table '" . db_config::TABLE_USER . "': " . $db->error;
+        }
+
+
+        // --- Competition Table ---
+
+        // make query for TABLE_COMPETITION
+        $query  = "create table IF NOT EXISTS " . db_config::TABLE_COMPETITION . " ( ";
+        $query .= db_kwd::COMPETITION_ID .          " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";  // Id of Competition
+        $query .= db_kwd::COMPETITION_DATE .        " date NOT NULL DEFAULT (CURRENT_DATE()), ";   // Date of competition  // WARN requires MySQL >8.0.13
+        $query .= db_kwd::COMPETITION_NAME .        " text, ";
+        $query .= db_kwd::COMPETITION_LOCATION .    " text, ";
+        $query .= db_kwd::COMPETITION_USER .        " int NOT NULL, ";
+        $query .= db_kwd::COMPETITION_AREAS .       " TINYINT(1) NOT NULL DEFAULT 0, ";
+        $query .= db_kwd::COMPETITION_FEATURE_SET . " TINYINT(1) NOT NULL DEFAULT 0, ";
+        $query .= db_kwd::COMPETITION_LIVE .        " TINYINT(1) NOT NULL DEFAULT 0)";             // 0 isn't Live, 1 is Live
+
+        // execute query and do error handling
+        if ($db->query($query) != true) {
+            return "couldn't create table '" . db_config::TABLE_COMPETITION . "': " . $db->error;
+        }
+
+
+        // --- Discipline Table ---
+
+        // make query for TABLE_DISCIPLINE
+        $query  = "create table  IF NOT EXISTS " . db_config::TABLE_DISCIPLINE . " ( ";
+        $query .= db_kwd::DISCIPLINE_ID .            " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";                                        // Id of discipline
+        $query .= db_kwd::DISCIPLINE_TIMESTAMP .     " TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), ";   // timestamp for calculating deltas
+        $query .= db_kwd::DISCIPLINE_COMPETITION .   " integer NOT NULL, ";                                                               // competition id
+        $query .= db_kwd::DISCIPLINE_TYPE .          " TINYINT(1) NOT NULL, ";                                                            // type of the category 
+        $query .= db_kwd::DISCIPLINE_FALLBACK_NAME . " text, ";                                                                           // fallback name, used in case of negative type
+        $query .= db_kwd::DISCIPLINE_ROUND .         " TINYINT(1) UNSIGNED NOT NULL, ";                                                   // round of the discipline inside of the competition (e.g. preliminary and final round)
+        $query .= db_kwd::DISCIPLINE_FINISHED .      " TINYINT(1) NOT NULL )";                                                            // 0 ongoing, 1 done
+
+        // execute query and do error handling
+        if ($db->query($query) != true) {
+            return "couldn't create table '" . db_config::TABLE_DISCIPLINE . "': " . $db->error;
+        }
+
+
+        // --- Results Table ---
+
+        // make query for TABLE_RESULT
+        $query  = "create table IF NOT EXISTS " . db_config::TABLE_RESULT . " ( ";
+        $query .= db_kwd::RESULT_ID .                   " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";                                         // Id of result (INT is enough)
+        $query .= db_kwd::RESULT_TIMESTAMP .            " TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), ";    // timestamp for calculating deltas
+        $query .= db_kwd::RESULT_DISCIPLINE .           " integer NOT NULL, ";                                                                // id of the discipline
+        $query .= db_kwd::RESULT_START_NUMBER .         " SMALLINT UNSIGNED, ";                                                               // 0 in case of Twitter
+        $query .= db_kwd::RESULT_NAME .                 " text, ";
+        $query .= db_kwd::RESULT_CLUB .                 " text, ";                                                                            // empty in case of Twitter
+        $query .= db_kwd::RESULT_SCORE_SUBMITTED .      " float, ";                                                                           // -1 in case of Twitter
+        $query .= db_kwd::RESULT_SCORE_ACCOMPLISHED .   " float, ";
+        $query .= db_kwd::RESULT_TIME .                 " SMALLINT UNSIGNED, ";                                                               // time in seconds, -99 if finished
+        $query .= db_kwd::RESULT_FINISHED .             " TINYINT(1) NOT NULL )";                                                             // 0 ongoing, 1 done
+
+        // execute query and do error handling
+        if ($db->query($query) != true) {
+            return "couldn't create table '" . db_config::TABLE_RESULT . "': " . $db->error;
+        }
+
+        return "";
     }
 
+    /**
+     * Returns the current time of the database (might be different if MySQL server and php server aren't the same device).
+     * The way an unsuccessful query is handled might be irritating (returning the php servers timer) but makes sense because, it helps code relying
+     * on this functions not to break, furthermore if the MySQL server can't return it's current time it probably has an error preventing it from handling all
+     * query relying on an accurate timestamp.
+     * 
+     * @param mysqli $db Database in which tables are created
+     * @return DateTime time of MySQL server (in case of error the time of the php server is returned)
+     */
+    public static function getCurrentTime(mysqli $db): DateTime
+    {
+        // prepare statement to request current timestamp
+        $statement = $db->prepare("select now()");
 
-    // --- Discipline Table ---
+        // execute statement and check if it was executed successfully
+        if ($statement->execute() == false) {
+            // return the current time of the server
+            return new DateTime();
+        }
 
-    // make query for TABLE_DISCIPLINE
-    $query  = "create table  IF NOT EXISTS " . db_config::TABLE_DISCIPLINE . " ( ";
-    $query .= db_kwd::DISCIPLINE_ID .            " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";                                        // Id of discipline
-    $query .= db_kwd::DISCIPLINE_TIMESTAMP .     " TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), ";   // timestamp for calculating deltas
-    $query .= db_kwd::DISCIPLINE_COMPETITION .   " integer NOT NULL, ";                                                               // competition id
-    $query .= db_kwd::DISCIPLINE_TYPE .          " TINYINT(1) NOT NULL, ";                                                            // type of the category 
-    $query .= db_kwd::DISCIPLINE_FALLBACK_NAME . " text, ";                                                                           // fallback name, used in case of negative type
-    $query .= db_kwd::DISCIPLINE_ROUND .         " TINYINT(1) UNSIGNED NOT NULL, ";                                                   // round of the discipline inside of the competition (e.g. preliminary and final round)
-    $query .= db_kwd::DISCIPLINE_FINISHED .      " TINYINT(1) NOT NULL )";                                                            // 0 ongoing, 1 done
+        // bind variable to result
+        $statement->bind_result($time);
 
-    // execute query and do error handling
-    if ($db->query($query) != true) {
-        return "couldn't create table '" . db_config::TABLE_DISCIPLINE . "': " . $db->error;
+        // no while required because only one result will be sent
+        $statement->fetch();
+
+        // try to generate DateTime from result, if it fails, log error and set time to current server time
+        try {
+            $time = new DateTime($time);
+        } catch (\Exception $e) {
+            error_log($e);
+            return new DateTime();
+        }
+
+        // return the mysql server time as DateTime object
+        return $time;
     }
-
-
-    // --- Results Table ---
-
-    // make query for TABLE_RESULT
-    $query  = "create table IF NOT EXISTS " . db_config::TABLE_RESULT . " ( ";
-    $query .= db_kwd::RESULT_ID .                   " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";                                         // Id of result (INT is enough)
-    $query .= db_kwd::RESULT_TIMESTAMP .            " TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), ";    // timestamp for calculating deltas
-    $query .= db_kwd::RESULT_DISCIPLINE .           " integer NOT NULL, ";                                                                // id of the discipline
-    $query .= db_kwd::RESULT_START_NUMBER .         " SMALLINT UNSIGNED, ";                                                               // 0 in case of Twitter
-    $query .= db_kwd::RESULT_NAME .                 " text, ";
-    $query .= db_kwd::RESULT_CLUB .                 " text, ";                                                                            // empty in case of Twitter
-    $query .= db_kwd::RESULT_SCORE_SUBMITTED .      " float, ";                                                                           // -1 in case of Twitter
-    $query .= db_kwd::RESULT_SCORE_ACCOMPLISHED .   " float, ";
-    $query .= db_kwd::RESULT_TIME .                 " SMALLINT UNSIGNED, ";                                                               // time in seconds, -99 if finished
-    $query .= db_kwd::RESULT_FINISHED .             " TINYINT(1) NOT NULL )";                                                             // 0 ongoing, 1 done
-
-    // execute query and do error handling
-    if ($db->query($query) != true) {
-        return "couldn't create table '" . db_config::TABLE_RESULT . "': " . $db->error;
-    }
-
-    return "";
-}
-
-/**
- * Returns the current time of the database (might be different if MySQL server and php server aren't the same device).
- * The way an unsuccessful query is handled might be irritating (returning the php servers timer) but makes sense because, it helps code relying
- * on this functions not to break, furthermore if the MySQL server can't return it's current time it probably has an error preventing it from handling all
- * query relying on an accurate timestamp.
- * 
- * @param mysqli $db Database in which tables are created
- * @return DateTime time of MySQL server (in case of error the time of the php server is returned)
- */
-function getCurrentTime(mysqli $db): DateTime
-{
-    // prepare statement to request current timestamp
-    $statement = $db->prepare("select now()");
-
-    // execute statement and check if it was executed successfully
-    if ($statement->execute() == false) {
-        // return the current time of the server
-        return new DateTime();
-    }
-
-    // bind variable to result
-    $statement->bind_result($time);
-
-    // no while required because only one result will be sent
-    $statement->fetch();
-
-    // try to generate DateTime from result, if it fails, log error and set time to current server time
-    try {
-        $time = new DateTime($time);
-    } catch (\Exception $e) {
-        error_log($e);
-        return new DateTime();
-    }
-
-    // return the mysql server time as DateTime object
-    return $time;
 }
