@@ -71,9 +71,10 @@ class user implements JsonSerializable, RepresentativeInterface
     }
 
     // explained in RepresentativeInterface
-    public function updateId(int $ID): void
+    public function updateId(int $ID): self
     {
         $this->data[self::KEY_ID] = $ID;
+        return $this;
     }
 
     // explained in RepresentativeInterface

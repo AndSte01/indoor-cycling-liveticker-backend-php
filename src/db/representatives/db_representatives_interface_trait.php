@@ -53,7 +53,7 @@ interface RepresentativeInterface
      * 
      * @param int $ID new id of the representative
      */
-    public function updateId(int $ID): void;
+    public function updateId(int $ID): self;
 }
 
 

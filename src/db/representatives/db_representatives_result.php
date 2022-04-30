@@ -135,9 +135,10 @@ class result implements JsonSerializable, RepresentativeChildInterface
     }
 
     // explained in RepresentativeInterface
-    public function updateId(int $ID): void
+    public function updateId(int $ID): self
     {
         $this->data[self::KEY_ID] = $ID;
+        return $this;
     }
 
     /**
