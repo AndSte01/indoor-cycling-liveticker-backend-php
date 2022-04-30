@@ -59,6 +59,8 @@ interface AdapterInterface
      * 
      * @param mysqli $db Database to work with
      * @param RepresentativeInterface[] $representatives Representatives to delete form database
+     * 
+     * @todo implement garbage collection (remove all child's assigned to this representative)
      */
     public static function remove(mysqli $db, array $representatives): void;
 }

@@ -253,6 +253,9 @@ class adapterCompetition implements AdapterInterface
     }
 
     // explained in the interface
+    /**
+     * @todo implement garbage collection (remove all child's assigned to this representative)
+     */
     public static function remove(mysqli $db, array $competitions): void
     {
         // prepare statement

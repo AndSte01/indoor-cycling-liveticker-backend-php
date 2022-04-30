@@ -326,6 +326,9 @@ class adapterResult implements AdapterInterface
     }
 
     // explained in the interface
+    /**
+     * @todo implement garbage collection (remove all child's assigned to this representative)
+     */
     public static function remove(mysqli $db, array $results): void
     {
         // prepare statement
