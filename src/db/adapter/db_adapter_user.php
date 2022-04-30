@@ -95,7 +95,7 @@ class adapterUser implements AdapterInterface
         // bind result values to statement
         $statement->bind_result($_1, $_2, $_3, $_4);
 
-        // iterate over (msql) results
+        // iterate over results
         while ($statement->fetch()) {
             $entry = new user();
             $entry->parse($_1, $_2, $_3, $_4, $db);
