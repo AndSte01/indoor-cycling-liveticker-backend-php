@@ -20,7 +20,7 @@ require_once(dirname(__FILE__) . "/../../../db/adapter/db_adapter_result.php");
 require_once(dirname(__FILE__) . "/../../../db/adapter/db_adapter_generic.php");
 
 // connect to database
-$db = connect();
+$db = adapterGeneric::connect();
 
 // set correct content type
 header("Content-Type: application/json");
@@ -39,6 +39,13 @@ die(json_encode(adapterResult::search($db)));
 // search for result by timestamp
 // $timestamp = (new DateTime())->modify("-1 day");
 // die(json_encode(adapterResult::search($db, null, null, $timestamp)));
+
+// search for result by competition
+// die(json_encode(adapterResult::searchByCompetition($db, 1)));
+
+// search for result by competition and timestamp
+// $timestamp = (new DateTime())->modify("-1 day");
+// die(json_encode(adapterResult::searchByCompetition($db, 1, $timestamp)));
 
 // --- ADD RESULTS TO DATABASE ---
 // $result1 = new result(null, null, 3, 103, "akjsdf", "sdflker", 64.45, 43.86, 0, 0);
