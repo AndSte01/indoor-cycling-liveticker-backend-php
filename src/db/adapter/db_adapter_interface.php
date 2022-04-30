@@ -24,6 +24,9 @@ interface AdapterInterface
     /**
      * Searches for representatives in the database
      * 
+     * A general purpose function to search for representatives in the database.
+     * More specific (and probably faster) search functions might be implemented, those shall be named searchByX where X is the more specific search term.
+     * 
      * @param mysqli $db Database to work with
      * 
      * @return RepresentativeInterface[] array of representatives found in the database
