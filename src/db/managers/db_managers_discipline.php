@@ -171,7 +171,7 @@ class managerDiscipline implements managerDisciplineInterface
      */
     private function validate(mysqli $db, discipline $disciplineToValidate): int
     {
-        // check if credentials are given, they are required by definition
+        // check if id is present
         if ($disciplineToValidate->{discipline::KEY_ID} == 0)
             return self::ERROR_MISSING_INFORMATION;
 

@@ -186,7 +186,7 @@ class managerCompetition implements managerCompetitionInterface
      */
     protected function validate(mysqli $db, competition $competitionToValidate): int
     {
-        // check if credentials are given, they are required by definition
+        // check if id is present
         if ($competitionToValidate->{competition::KEY_ID} == 0)
             return self::ERROR_MISSING_INFORMATION;
 
