@@ -147,9 +147,9 @@ class adapterResult implements AdapterInterface
     /**
      * Searches for results in the database by a competition id (timestamp for deltas is supported)
      * 
-     * This function searches for results by multiple discipline id's which are acquired by doing a nested search for the disciplines linked to the
-     * competition id. This is all done with a single MySQL statement:
-     * `SELECT fields FROM results WHERE competitions.id IN (SELECT id FROM competitions WHERE id=?) AND timestamp >=?`
+     * This function joins results and discipline table (at discipline's id) and then searches for competition id. 
+     * This is all done with a single MySQL statement:
+     * `SELECT results.* FROM results LEFT JOIN disciplines ON results.discipline = disciplines.ID WHERE disciplines.competition = ? [AND timestamp >=?];`
      * 
      * @param mysqli $db The database to work with
      * @param int $competition_id The id of the competition the desired results are indirectly (via disciplines) assigned to.
@@ -173,29 +173,46 @@ class adapterResult implements AdapterInterface
 
         // check if addititonal filter for timestamp should be added
         if ($modified_since != null) {
-            $timestamp = " AND " . db_kwd::RESULT_TIMESTAMP . ">=?";
+            $timestamp = " AND " . db_config::TABLE_RESULT . "." . db_kwd::RESULT_TIMESTAMP . ">=?";
             $parameters[] = $modified_since->format('Y-m-d H:i:s');
         }
 
-        // SELECT fields FROM results WHERE competitions.id IN (SELECT id FROM competitions WHERE id=?)
+        // small function is applied to all array elements and adds name of the table in front of it
+        // accessing the function by name seems to be the fastest way https://stackoverflow.com/questions/18144782
+        function addTableName($field)
+        {
+            return db_config::TABLE_RESULT . "." . strval($field);
+        };
+
+        // SELECT dev_results_liveticker.* FROM dev_results_liveticker LEFT JOIN dev_disciplines_liveticker ON dev_results_liveticker.discipline = dev_disciplines_liveticker.ID WHERE dev_disciplines_liveticker.competition = ? AND timestamp>=?;
         // Create SQL query
-        $statement = $db->prepare("SELECT " . implode(", ", [
-            db_kwd::RESULT_ID,
-            db_kwd::RESULT_TIMESTAMP,
-            db_kwd::RESULT_DISCIPLINE,
-            db_kwd::RESULT_START_NUMBER,
-            db_kwd::RESULT_NAME,
-            db_kwd::RESULT_CLUB,
-            db_kwd::RESULT_SCORE_SUBMITTED,
-            db_kwd::RESULT_SCORE_ACCOMPLISHED,
-            db_kwd::RESULT_TIME,
-            db_kwd::RESULT_FINISHED
-        ]) .
+        $statement = $db->prepare("SELECT " .
+            // select fields    
+            implode(
+                ", ",
+                // add name of the table in front of the field names
+                array_map(
+                    'db\addTableName',
+                    [
+                        db_kwd::RESULT_ID,
+                        db_kwd::RESULT_TIMESTAMP,
+                        db_kwd::RESULT_DISCIPLINE,
+                        db_kwd::RESULT_START_NUMBER,
+                        db_kwd::RESULT_NAME,
+                        db_kwd::RESULT_CLUB,
+                        db_kwd::RESULT_SCORE_SUBMITTED,
+                        db_kwd::RESULT_SCORE_ACCOMPLISHED,
+                        db_kwd::RESULT_TIME,
+                        db_kwd::RESULT_FINISHED
+                    ]
+                )
+            ) .
             " FROM " . db_config::TABLE_RESULT .
-            " WHERE " . db_kwd::RESULT_DISCIPLINE . " IN (" .
-            // now do nested search for discipline id's
-            "SELECT " . db_kwd::DISCIPLINE_ID . " FROM " . db_config::TABLE_DISCIPLINE . " WHERE " . db_kwd::DISCIPLINE_COMPETITION . "=?" .
-            ")$timestamp;");
+            " LEFT JOIN " . db_config::TABLE_DISCIPLINE .
+            " ON " . db_config::TABLE_RESULT . "." . db_kwd::RESULT_DISCIPLINE . " = " . db_config::TABLE_DISCIPLINE . "." . db_kwd::DISCIPLINE_ID .
+            " WHERE " . db_kwd::DISCIPLINE_COMPETITION . "=?" .
+            $timestamp .
+            ";");
 
         // execute statement
         $statement->execute($parameters);
