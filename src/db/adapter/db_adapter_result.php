@@ -27,13 +27,16 @@ class adapterResult implements AdapterInterface
 {
     /**
      * @param ?int $results Id of the result to search for
-     * @param ?int $discipline_id Id of the disciplines whose results should be returned
+     * @param ?array $discipline_id Id of the disciplines whose results should be returned
      * @param ?DateTime $modifiedSince Get disciplines that were modified after the time passed
+     * @param ?int $start_number The start number of the competitor
+     * @param ?string $name The name of the competitor
+     * @param ?string $club The club of the competitor
      */
     public static function search(
         mysqli $db,
         ?int $results_id = null,
-        ?int $discipline_id = null,
+        ?array $discipline_id = null,
         ?DateTime $modified_since = null,
         ?int $start_number = null,
         ?string $name = null,
@@ -52,8 +55,14 @@ class adapterResult implements AdapterInterface
             $parameters[] = strval($results_id);
         }
         if (($discipline_id != null)) {
-            $filter[] = db_kwd::RESULT_DISCIPLINE . "=?";
-            $parameters[]  = strval($discipline_id);
+            $filter[] = db_kwd::RESULT_DISCIPLINE .
+                " IN(?" . // if array is not null at least one element is in there (this is it's question mark)
+                str_repeat(",?", count($discipline_id) - 1) . // add additional question marks for id's that aren't stored in the first array element
+                ")";
+            // merge the two arrays
+            // array_values is used to make $discipline_id (that might be an assoc array) a list (see array_is_list)
+            // array_map is used to convert to strings
+            $parameters = array_merge($parameters, array_values(array_map('strval', $discipline_id)));
         }
         if ($modified_since != null) {
             // greater or equal is required so no disciplines with "bad timing" are missed,
