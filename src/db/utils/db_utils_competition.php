@@ -22,12 +22,13 @@ require_once(dirname(__FILE__) . "/../../errors.php");
  * Converts competition errors to a string of errors defined in errors.php
  * 
  * @param int $error the error from managerCompetitionInterface
+ * @param bool $prepareDie Prepares the header for immediate call of die() afterwards
  * 
  * @return string the errors as a string
  */
-function competitionErrorsToString(int $errors, bool $prepareDie = false): string
+function competitionErrorsToString(int $error, bool $prepareDie = false): string
 {
-    switch ($errors) {
+    switch ($error) {
         case managerCompetition::ERROR_ALREADY_EXISTING:
             return errors::to_error_string([errors::ALREADY_EXISTS], $prepareDie);
 

@@ -16,11 +16,16 @@ namespace db;
  */
 class db_config
 {
+    /** @var string Name of the database */
     const NAME     = "liveticker";
+    /** @var string Name of a user that has read/write access to the database */
     const USER     = 'liveticker';
+    /** @var string The password of the user (see USER) */
     const PASSWORD = 'mysqlliveticker';
+    /** @var string Hostname of the Database server */
     const HOST     = "localhost";
 
+    // name of the tables
     const TABLE_USER        = "dev_users_liveticker";
     const TABLE_COMPETITION = "dev_competitions_liveticker";
     const TABLE_DISCIPLINE  = "dev_disciplines_liveticker";

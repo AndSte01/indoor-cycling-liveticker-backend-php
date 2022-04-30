@@ -22,6 +22,9 @@ require_once(dirname(__FILE__) . "/../representatives/db_representatives_competi
 use mysqli;
 use DateTime;
 
+/**
+ * Database adapter for competitions
+ */
 class adapterCompetition implements AdapterInterface
 {
     /**

@@ -34,7 +34,7 @@ class discipline implements JsonSerializable, RepresentativeChildInterface
      * 
      * If you can't set the type (e. g. lack of support in application set it to -1)
      * 
-     * | ...         | `000`      | `0`    | `000` |
+     * | ...         | 000        | 0      | 000   |
      * | ----------- | ---------- | ------ | ----- |
      * | reserved    | Discipline | gender | age   |
      * 

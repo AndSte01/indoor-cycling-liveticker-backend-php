@@ -21,6 +21,9 @@ require_once(dirname(__FILE__) . "/../representatives/db_representatives_user.ph
 // define aliases
 use mysqli;
 
+/**
+ * Database adapter for users
+ */
 class adapterUser implements AdapterInterface
 {
     /**

@@ -113,7 +113,7 @@ exit();
 /**
  * Gets competition from database
  * 
- * @param string $days how many days back competitions should be displayed
+ * @param string $daysSinceToday how many days back competitions should be displayed
  * @param string $limit how many competitions should be returned (default GET_DEFAULT_COMPETITIONS_LIMIT)
  * 
  * @return string String of a JSON array either containing the occurred errors or the competitions

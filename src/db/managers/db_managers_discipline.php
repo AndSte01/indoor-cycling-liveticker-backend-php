@@ -33,6 +33,7 @@ class managerDiscipline implements managerDisciplineInterface
      * Constructor
      * 
      * @param mysqli $db The database the disciplines are stored in
+     * @param int $competition_id The id of the competition to use
      * 
      * @throws Exception if database is null
      */

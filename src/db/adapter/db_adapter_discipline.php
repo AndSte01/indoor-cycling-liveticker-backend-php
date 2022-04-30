@@ -23,6 +23,9 @@ require_once(dirname(__FILE__) . "/../representatives/db_representatives_discipl
 use DateTime;
 use mysqli;
 
+/**
+ * Database adapter for disciplines
+ */
 class adapterDiscipline implements adapterInterface
 {
     /**
@@ -30,6 +33,8 @@ class adapterDiscipline implements adapterInterface
      * @param ?int $competition_id Id of the competition whose disciplines should be returned
      * @param ?DateTime $modified_since Get disciplines that were modified after the time passed
      * @param ?string $fallback_name The fallback name of the discipline
+     * @param ?int $type The type of the discipline
+     * @param ?int $round The round of the competition the discipline is located in
      */
     public static function search(
         mysqli $db,

@@ -22,6 +22,9 @@ require_once(dirname(__FILE__) . "/../representatives/db_representatives_result.
 use DateTime;
 use mysqli;
 
+/**
+ * Database adapter for results
+ */
 class adapterResult implements AdapterInterface
 {
     /**

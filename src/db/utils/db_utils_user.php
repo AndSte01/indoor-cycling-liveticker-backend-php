@@ -24,6 +24,7 @@ require_once(dirname(__FILE__) . "/../../errors.php");
  * Converts user errors to a string of errors defined in errors.php
  * 
  * @param int $error the error from managerAuthenticationInterface
+ * @param bool $prepareDie Prepares the header for immediate call of die() afterwards
  * 
  * @return string the errors as a string
  */

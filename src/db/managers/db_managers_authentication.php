@@ -48,6 +48,10 @@ class managerAuthentication implements managerAuthenticationInterface
 
     /**
      * Constructor
+     * 
+     * @param managerUserInterface $userProvider The user provider to user
+     * @param string $realm The realm the authentication should be valid in
+     * @param string $opaque Unchanged string returned by client
      */
     public function __construct(managerUserInterface $userProvider, string $realm, string $opaque = "")
     {
@@ -270,7 +274,7 @@ class managerAuthentication implements managerAuthenticationInterface
     /**
      * function to parse the http auth header
      * 
-     * @source https://www.php.net/manual/en/features.http-auth.php
+     * @see https://www.php.net/manual/en/features.http-auth.php
      */
     protected static function http_digest_parse($txt)
     {

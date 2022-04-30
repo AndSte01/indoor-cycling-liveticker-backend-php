@@ -49,7 +49,7 @@ interface managerCompetitionInterface
     /**
      * Searches for competitions for several days in the past with a limit
      * 
-     * @param ?int $daysSinceTody How many days back from today competitions should be searched for
+     * @param ?int $daysSinceToday How many days back from today competitions should be searched for
      * @param ?int $limit The number of competitions that should be returned (there might be a maximal amount implemented)
      * 
      * @return competitions[] Array of found competitions (might be empty)
@@ -70,7 +70,7 @@ interface managerCompetitionInterface
      * 
      * Note: It is assumed that the id passed is valid! NO FURTHER CHECKS ARE DONE!
      * 
-     * @param ?user The user the manager should work with (must be a valid user)
+     * @param ?int $id The user id the manager should work with (must be a valid id)
      */
     public function setCurrentUserId(?int $id): void;
 

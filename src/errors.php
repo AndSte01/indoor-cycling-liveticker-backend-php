@@ -44,7 +44,7 @@ class errors
      * Convert an array of different errors into an string
      * 
      * @param array $errors array of errors
-     * @param bool $prepareReturn Prepares the header for immediate call of die() afterwards 
+     * @param bool $prepareDie Prepares the header for immediate call of die() afterwards
      * 
      * @return string string representation (JSON array) of errors
      */
