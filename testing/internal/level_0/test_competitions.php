@@ -18,7 +18,7 @@ require_once("db/adapter/db_adapter_competition.php");
 require_once("db/adapter/db_adapter_generic.php");
 
 // connect to database
-$db = connect();
+$db = adapterGeneric::connect();
 
 // setting correct header
 header("Content-Type: application/json");

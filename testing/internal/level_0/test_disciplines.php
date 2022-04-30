@@ -20,7 +20,7 @@ require_once(dirname(__FILE__) . "/../../../db/adapter/db_adapter_discipline.php
 require_once(dirname(__FILE__) . "/../../../db/adapter/db_adapter_generic.php");
 
 // connect to database
-$db = connect();
+$db = adapterGeneric::connect();
 
 // set correct content type
 header("Content-Type: application/json");
