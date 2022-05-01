@@ -9,6 +9,77 @@
  * FUNCTIONS IN THIS SCRIPT DO NOT CHECK FOR ERRORS OR INVALID ARGUMENTS, USE FUNCTIONS PROVIDED IN "db_utils.php"!!!
  * 
  * 
+ * users table
+ * 
+ * | column   | typ    | not null | default | extra                        | content                        |
+ * | -------- | ------ | :------: | ------- | ---------------------------- | ------------------------------ |
+ * | ID       | `INT`  |    X     |         | `AUTO_INCREMENT PRIMARY KEY` | Id of the user                 |
+ * | name     | `text` |    X     |         |                              | Name of the user               |
+ * | password | `text` |    X     |         |                              | Password of the user           |
+ * | role     | `INT`  |    X     | 0       |                              | Role of the user (e. g. Admin) |
+ * 
+ * 
+ * competitions table
+ * 
+ * | column      | typ          | not null | default          | extra                                                                      | content                                       |
+ * | ----------- | ------------ | :------: | ---------------- | -------------------------------------------------------------------------- | --------------------------------------------- |
+ * | ID          | `INT`        |    X     |                  | `PRIMARY_KEY`                                                              | Id of the competition                         |
+ * | date        | `date`       |    X     | `CURRENT_DATE()` |                                                                            | Date of the competition                       |
+ * | name        | `text`       |          |                  |                                                                            | Name of the competition                       |
+ * | location    | `text`       |          |                  |                                                                            | Location where the competition takes place    |
+ * | user        | `INT`        |    ~     |                  | `FOREIGN KEY ... REFERENCES user(ID) ON DELETE SET NULL ON UPDATE CASCADE` | Id of the user the competition is assigned to |
+ * | areas       | `TINYINT(1)` |    X     | 0                |                                                                            | Number of areas in the competition            |
+ * | feature_set | `TINYINT(1)` |    X     | 0                |                                                                            | feature set of the competition                |
+ * | live        | `TINYINT(1)` |    X     | 0                |                                                                            | Wether competition is live (1) or not (0)     |
+ * 
+ * ~: The database allows null, but the adapter (part of this software) explicitly prevents the value from being written to the database.
+ * 
+ * 
+ * disciplines table
+ * 
+ * | column        | typ          | not null | default               | extra                                                                            | content                                               |
+ * | ------------- | ------------ | :------: | --------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------- |
+ * | ID            | `INT`        |    X     |                       | `AUTO_INCREMENT PRIMARY_KEY`                                                     | The id of the discipline                              |
+ * | timestamp     | `TIMESTAMP`  |    X     | `current_timestamp()` | `ON UPDATE current_timestamp()`                                                  | Timestamp for calculating deltas                      |
+ * | competition   | `INT`        |    X     |                       | `FOREIGN KEY ... REFERENCES competition(ID) ON DELETE CASCADE ON UPDATE CASCADE` | Id of the competition the discipline is assigned to   |
+ * | type          | `TINYINT(1)` |    X     | -1                    |                                                                                  | type of the discipline                                |
+ * | fallback_name | `text`       |          |                       |                                                                                  | The name used in case type couldn't be set            |
+ * | round         | `TINYINT(1)` |    X     | 0                     | `UNSIGNED`                                                                       | Round of the competition the discipline is located in |
+ * | finished      | `TINYINT(1)` |    X     | 1                     |                                                                                  | Wether the discipline is finished or not              |
+ * 
+ * explanation of type (used in discipline):
+ * | `0`         | `000`      | `0`    | `000` |
+ * | ----------- | ---------- | ------ | ----- |
+ * | error, sign | Discipline | gender | age   |
+ * 
+ * |       | Discipline                     |   |     | gender     |    |       | age         |
+ * | ----- | ------------------------------ |   | --- | ---------- |    | ----- | ----------- |
+ * | `000` | Single artistic cycling        |   | `0` | male, open |    | `000` | reserved    |
+ * | `001` | Pair artistic cycling          |   | `1` | female     |    | `001` | Pupils  U11 |
+ * | `010` | Artistic Cycling Team 4 (ACT4) |                           | `010` | Pupils  U13 |
+ * | `011` | Artistic Cycling Team 6 (ACT6) |                           | `011` | Pupils  U15 |
+ * | `110` | Unicycle Team 4                |                           | `100` | Juniors U19 |
+ * | `111` | Unicycle Team 6                |                           | `101` | Elite   O18 |
+ * 
+ * If the client doesn't support discipline by type, type should be set to (10000001 or. -1). Then the fallback_name should be set with a meaningful string.
+ * 
+ * 
+ * results table
+ * 
+ * | column             | typ          | not null | default               | extra                                                                           | content                                                         |
+ * | ------------------ | ------------ | :------: | --------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+ * | ID                 | `INT`        |    X     |                       | `AUTO_INCREMENT PRIMARY KEY`                                                    | The id of the result                                            |
+ * | timestamp          | `TIMESTAMP`  |    X     | `current_timestamp()` | `ON UPDATE current_timestamp()`                                                 | Timestamp for calculating deltas                                |
+ * | discipline         | `INT`        |    X     |                       | `FOREIGN KEY ... REFERENCES discipline(ID) ON DELETE CASCADE ON UPDATE CASCADE` | Id of the discipline the result is assigned to                  |
+ * | start_number       | `SMALLINT`   |          |                       | `UNSIGNED`                                                                      | Start number of the competitor                                  |
+ * | name               | `text`       |          |                       |                                                                                 | Name of the competitor                                          |
+ * | club               | `text`       |          |                       |                                                                                 | NAme of the club of the competitor                              |
+ * | score_submitted    | `float`      |          |                       |                                                                                 | The score the competitor submitted                              |
+ * | score_accomplished | `float`      |          |                       |                                                                                 | The score the competitor accomplished                           |
+ * | time               | `SMALLINT`   |          | 0                     | `UNSIGNED`                                                                      | The current of the program (the competitor presents) in seconds |
+ * | finished           | `TINYINT(1)` |    X     | 1                     |                                                                                 | Wether the competitor finished or not                           |
+ * 
+ * 
  * @package Database\Database
  * 
  * @todo make ID unsigned (some time in the future)
