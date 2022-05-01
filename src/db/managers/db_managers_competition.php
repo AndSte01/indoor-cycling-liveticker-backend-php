@@ -105,8 +105,15 @@ class managerCompetition implements managerCompetitionInterface
     }
 
     // explained in the interface
+    /**
+     * @throws Exception If current user id (see setCurrentUserId()) is null
+     */
     public function add(competition $competition): int|competition
     {
+        // first check for exception
+        if ($this->currentUserID == null)
+            throw new Exception("current user id mustn't be null (set with setCurrentUserId() beforehand)");
+
         // make the competition ready for the database (so early because some of strings)
         $competition->makeDbReady($this->db);
 
