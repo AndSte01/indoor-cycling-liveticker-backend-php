@@ -234,9 +234,6 @@ class adapterDiscipline implements adapterInterface
     }
 
     // explained in the interface
-    /**
-     * @todo implement garbage collection (remove all child's assigned to this representative)
-     */
     public static function remove(mysqli $db, array $disciplines): void
     {
         // prepare statement
