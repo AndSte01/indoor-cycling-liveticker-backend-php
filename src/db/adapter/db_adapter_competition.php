@@ -156,6 +156,10 @@ class adapterCompetition implements AdapterInterface
     }
 
     // explained in the interface
+    /**
+     * Note: you can't add a competition where user_id is null,
+     * it gets prevented even though the database would alow for it.
+     */
     public static function add(mysqli $db, array $competitions): array
     {
         // empty return array
@@ -195,6 +199,10 @@ class adapterCompetition implements AdapterInterface
             $comp_areas = $competition->{competition::KEY_AREAS};
             $comp_feature_set = $competition->{competition::KEY_FEATURE_SET};
             $comp_live = $competition->{competition::KEY_LIVE};
+
+            // prevent writing of competitions with no user (it happens quietly!!!)
+            if ($comp_user == null)
+                continue;
 
             if (!$statement->execute()) {
                 error_log("error while writing competition to database");
