@@ -11,13 +11,13 @@ require_once(dirname(__FILE__) . "/../../../db/managers/db_managers_authenticati
 require_once(dirname(__FILE__) . "/../../../errors.php");
 
 // define aliases
-use function db\connect;
+use db\adapterGeneric;
 
 // realm used for login
 $realm = "test";
 
 // connect to database
-$db = connect();
+$db = adapterGeneric::connect();
 
 // create providers
 $userProvider = new managerUser($db);
