@@ -9,29 +9,43 @@
  * FUNCTIONS IN THIS SCRIPT DO NOT CHECK FOR ERRORS OR INVALID ARGUMENTS, USE FUNCTIONS PROVIDED IN "db_utils.php"!!!
  * 
  * 
- * Layout of db_config::TABLE_USER
+ * users table
  * 
- * | ID                                  | name | password | role     |
- * | ----------------------------------- | ---- | -------- | -------- |
- * | INT                                 | text | text     | INT      |
- * | NOT NULL AUTO_INCREMENT PRIMARY KEY |      |          | NOT NULL |
- * 
- * 
- * Layout of db_config::TABLE_COMPETITION
- * 
- * | ID                                  | date                              | name | location | user     | areas      | feature_set | live       |
- * | ----------------------------------- | --------------------------------- | ---- | -------- | -------- | ---------- | ----------- | ---------- |
- * | INT                                 | date                              | text | text     | int      | TINYINT(1) | TINYINT(1)  | TINYINT(1) |
- * | NOT NULL AUTO_INCREMENT PRIMARY KEY | NOT NULL DEFAULT (CURRENT_DATE()) |      |          | NOT NULL |           NOT NULL DEFAULT 0          |
+ * | column   | typ    | not null | default | extra                        | content                        |
+ * | -------- | ------ | :------: | ------- | ---------------------------- | ------------------------------ |
+ * | ID       | `INT`  |    X     |         | `AUTO_INCREMENT PRIMARY KEY` | Id of the user                 |
+ * | name     | `text` |    X     |         |                              | Name of the user               |
+ * | password | `text` |    X     |         |                              | Password of the user           |
+ * | role     | `INT`  |    X     | 0       |                              | Role of the user (e. g. Admin) |
  * 
  * 
- * Layout of db_config::TABLE_DISCIPLINE
+ * competitions table
  * 
- * | ID                                  | timestamp                                                          | competition | type       | fallback_name | round      | finished   |
- * | ----------------------------------- | ------------------------------------------------------------------ | ----------- | ---------- | ------------- | ---------- | ---------- |
- * | INT                                 | TIMESTAMP                                                          | integer     | TINYINT(1) | text          | TINYINT(1) | TINYINT(1) |
- * | NOT NULL AUTO_INCREMENT PRIMARY KEY | NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() |         NOT NULL         |               | UNSIGNED   |            |
- * |                                     |                                                                    |                          |               |         NOT NULL        |
+ * | column      | typ          | not null | default          | extra                                                                      | content                                       |
+ * | ----------- | ------------ | :------: | ---------------- | -------------------------------------------------------------------------- | --------------------------------------------- |
+ * | ID          | `INT`        |    X     |                  | `PRIMARY_KEY`                                                              | Id of the competition                         |
+ * | date        | `date`       |    X     | `CURRENT_DATE()` |                                                                            | Date of the competition                       |
+ * | name        | `text`       |          |                  |                                                                            | Name of the competition                       |
+ * | location    | `text`       |          |                  |                                                                            | Location where the competition takes place    |
+ * | user        | `INT`        |    ~     |                  | `FOREIGN KEY ... REFERENCES user(ID) ON DELETE SET NULL ON UPDATE CASCADE` | Id of the user the competition is assigned to |
+ * | areas       | `TINYINT(1)` |    X     | 0                |                                                                            | Number of areas in the competition            |
+ * | feature_set | `TINYINT(1)` |    X     | 0                |                                                                            | feature set of the competition                |
+ * | live        | `TINYINT(1)` |    X     | 0                |                                                                            | Wether competition is live (1) or not (0)     |
+ * 
+ * ~: The database allows null, but the adapter (part of this software) explicitly prevents the value from being written to the database.
+ * 
+ * 
+ * disciplines table
+ * 
+ * | column        | typ          | not null | default               | extra                                                                            | content                                               |
+ * | ------------- | ------------ | :------: | --------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------- |
+ * | ID            | `INT`        |    X     |                       | `AUTO_INCREMENT PRIMARY_KEY`                                                     | The id of the discipline                              |
+ * | timestamp     | `TIMESTAMP`  |    X     | `current_timestamp()` | `ON UPDATE current_timestamp()`                                                  | Timestamp for calculating deltas                      |
+ * | competition   | `INT`        |    X     |                       | `FOREIGN KEY ... REFERENCES competition(ID) ON DELETE CASCADE ON UPDATE CASCADE` | Id of the competition the discipline is assigned to   |
+ * | type          | `TINYINT(1)` |    X     | -1                    |                                                                                  | type of the discipline                                |
+ * | fallback_name | `text`       |          |                       |                                                                                  | The name used in case type couldn't be set            |
+ * | round         | `TINYINT(1)` |    X     | 0                     | `UNSIGNED`                                                                       | Round of the competition the discipline is located in |
+ * | finished      | `TINYINT(1)` |    X     | 1                     |                                                                                  | Wether the discipline is finished or not              |
  * 
  * explanation of type (used in discipline):
  * | `0`         | `000`      | `0`    | `000` |
@@ -50,12 +64,20 @@
  * If the client doesn't support discipline by type, type should be set to (10000001 or. -1). Then the fallback_name should be set with a meaningful string.
  * 
  * 
- * Layout of db_config::TABLE_RESULT
+ * results table
  * 
- * | ID                                  | timestamp                                                          | discipline | start_number | name | club | score_submitted | score_accomplished | time     | finished   |
- * | ----------------------------------- | ------------------------------------------------------------------ | ---------- | ------------ | ---- | ---- | --------------- | ------------------ | -------- | ---------- |
- * | INT                                 | TIMESTAMP                                                          | integer    | SMALLINT     | text | text | float           | float              | SMALLINT | TINYINT(1) |
- * | NOT NULL AUTO_INCREMENT PRIMARY KEY | NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() | NOT NULL   | UNSIGNED     |      |      |                 |                    | UNSIGNED | NOT NULL   |
+ * | column             | typ          | not null | default               | extra                                                                           | content                                                         |
+ * | ------------------ | ------------ | :------: | --------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+ * | ID                 | `INT`        |    X     |                       | `AUTO_INCREMENT PRIMARY KEY`                                                    | The id of the result                                            |
+ * | timestamp          | `TIMESTAMP`  |    X     | `current_timestamp()` | `ON UPDATE current_timestamp()`                                                 | Timestamp for calculating deltas                                |
+ * | discipline         | `INT`        |    X     |                       | `FOREIGN KEY ... REFERENCES discipline(ID) ON DELETE CASCADE ON UPDATE CASCADE` | Id of the discipline the result is assigned to                  |
+ * | start_number       | `SMALLINT`   |          |                       | `UNSIGNED`                                                                      | Start number of the competitor                                  |
+ * | name               | `text`       |          |                       |                                                                                 | Name of the competitor                                          |
+ * | club               | `text`       |          |                       |                                                                                 | NAme of the club of the competitor                              |
+ * | score_submitted    | `float`      |          |                       |                                                                                 | The score the competitor submitted                              |
+ * | score_accomplished | `float`      |          |                       |                                                                                 | The score the competitor accomplished                           |
+ * | time               | `SMALLINT`   |          | 0                     | `UNSIGNED`                                                                      | The current of the program (the competitor presents) in seconds |
+ * | finished           | `TINYINT(1)` |    X     | 1                     |                                                                                 | Wether the competitor finished or not                           |
  * 
  * 
  * @package Database\Database
@@ -110,20 +132,21 @@ class adapterGeneric
      * Sets up the tables of the database
      * 
      * @param mysqli $db Database in which tables are created
-     * @return string|null error message
-     * 
-     * @todo php 8: make use of union type for return
+     * @return string error message
      */
     public static function createTables(mysqli $db): string
     {
         // --- User Table ---
 
         // make query for TABLE_USER
-        $query  = "create table IF NOT EXISTS " . db_config::TABLE_USER . " ( ";
-        $query .= db_kwd::USER_ID .          " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";  // Id of the user
-        $query .= db_kwd::USER_NAME .        " text NOT NULL, ";                            // Username
-        $query .= db_kwd::USER_PASSWORD .    " text NOT NULL, ";                            // Password
-        $query .= db_kwd::USER_ROLE .        " INT NOT NULL)";                              // Role
+        $query = "create table IF NOT EXISTS " . db_config::TABLE_USER . " ( " .
+            db_kwd::USER_ID .          " INT NOT NULL AUTO_INCREMENT, " .              // Id of the user
+            db_kwd::USER_NAME .        " text NOT NULL, " .                            // Username
+            db_kwd::USER_PASSWORD .    " text NOT NULL, " .                            // Password
+            db_kwd::USER_ROLE .        " INT NOT NULL DEFAULT 0, " .                             // Role
+            "PRIMARY KEY (" . db_kwd::USER_ID . ")" .
+            ");";
+
 
         // execute query and do error handling
         if ($db->query($query) != true) {
@@ -134,15 +157,18 @@ class adapterGeneric
         // --- Competition Table ---
 
         // make query for TABLE_COMPETITION
-        $query  = "create table IF NOT EXISTS " . db_config::TABLE_COMPETITION . " ( ";
-        $query .= db_kwd::COMPETITION_ID .          " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";  // Id of Competition
-        $query .= db_kwd::COMPETITION_DATE .        " date NOT NULL DEFAULT (CURRENT_DATE()), ";   // Date of competition  // WARN requires MySQL >8.0.13
-        $query .= db_kwd::COMPETITION_NAME .        " text, ";
-        $query .= db_kwd::COMPETITION_LOCATION .    " text, ";
-        $query .= db_kwd::COMPETITION_USER .        " int NOT NULL, ";
-        $query .= db_kwd::COMPETITION_AREAS .       " TINYINT(1) NOT NULL DEFAULT 0, ";
-        $query .= db_kwd::COMPETITION_FEATURE_SET . " TINYINT(1) NOT NULL DEFAULT 0, ";
-        $query .= db_kwd::COMPETITION_LIVE .        " TINYINT(1) NOT NULL DEFAULT 0)";             // 0 isn't Live, 1 is Live
+        $query = "create table IF NOT EXISTS " . db_config::TABLE_COMPETITION . " ( " .
+            db_kwd::COMPETITION_ID .          " INT NOT NULL AUTO_INCREMENT, " .            // Id of Competition
+            db_kwd::COMPETITION_DATE .        " date NOT NULL DEFAULT (CURRENT_DATE()), " . // Date of competition  // WARN requires MySQL >8.0.13
+            db_kwd::COMPETITION_NAME .        " text, " .
+            db_kwd::COMPETITION_LOCATION .    " text, " .
+            db_kwd::COMPETITION_USER .        " INT, " .
+            db_kwd::COMPETITION_AREAS .       " TINYINT(1) NOT NULL DEFAULT 0, " .
+            db_kwd::COMPETITION_FEATURE_SET . " TINYINT(1) NOT NULL DEFAULT 0, " .
+            db_kwd::COMPETITION_LIVE .        " TINYINT(1) NOT NULL DEFAULT 0, " .          // 0 isn't Live, 1 is Live
+            "PRIMARY KEY (" . db_kwd::COMPETITION_ID . "), " .
+            "FOREIGN KEY (" . db_kwd::COMPETITION_USER . ") REFERENCES " . db_config::TABLE_USER . "(" . db_kwd::USER_ID . ") ON DELETE SET NULL ON UPDATE CASCADE" .
+            ");";
 
         // execute query and do error handling
         if ($db->query($query) != true) {
@@ -153,15 +179,17 @@ class adapterGeneric
         // --- Discipline Table ---
 
         // make query for TABLE_DISCIPLINE
-        $query  = "create table  IF NOT EXISTS " . db_config::TABLE_DISCIPLINE . " ( ";
-        $query .= db_kwd::DISCIPLINE_ID .            " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";                                        // Id of discipline
-        $query .= db_kwd::DISCIPLINE_TIMESTAMP .     " TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), ";   // timestamp for calculating deltas
-        $query .= db_kwd::DISCIPLINE_COMPETITION .   " integer NOT NULL, ";                                                               // competition id
-        $query .= db_kwd::DISCIPLINE_TYPE .          " TINYINT(1) NOT NULL, ";                                                            // type of the category 
-        $query .= db_kwd::DISCIPLINE_FALLBACK_NAME . " text, ";                                                                           // fallback name, used in case of negative type
-        $query .= db_kwd::DISCIPLINE_ROUND .         " TINYINT(1) UNSIGNED NOT NULL, ";                                                   // round of the discipline inside of the competition (e.g. preliminary and final round)
-        $query .= db_kwd::DISCIPLINE_FINISHED .      " TINYINT(1) NOT NULL )";                                                            // 0 ongoing, 1 done
-
+        $query = "create table  IF NOT EXISTS " . db_config::TABLE_DISCIPLINE . " ( " .
+            db_kwd::DISCIPLINE_ID .            " INT NOT NULL AUTO_INCREMENT, " .                                                    // Id of discipline
+            db_kwd::DISCIPLINE_TIMESTAMP .     " TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), " .   // timestamp for calculating deltas
+            db_kwd::DISCIPLINE_COMPETITION .   " INT NOT NULL, " .                                                               // competition id
+            db_kwd::DISCIPLINE_TYPE .          " TINYINT(1) NOT NULL DEFAULT -1, " .                                                 // type of the category 
+            db_kwd::DISCIPLINE_FALLBACK_NAME . " text, " .                                                                           // fallback name, used in case of negative type
+            db_kwd::DISCIPLINE_ROUND .         " TINYINT(1) UNSIGNED NOT NULL DEFAULT 0, " .                                         // round of the discipline inside of the competition (e.g. preliminary and final round)
+            db_kwd::DISCIPLINE_FINISHED .      " TINYINT(1) NOT NULL DEFAULT 1, " .                                                  // 0 ongoing, 1 done
+            "PRIMARY KEY (" . db_kwd::DISCIPLINE_ID . "), " .
+            "FOREIGN KEY (" . db_kwd::DISCIPLINE_COMPETITION . ") REFERENCES " . db_config::TABLE_COMPETITION . "(" . db_kwd::COMPETITION_ID . ") ON DELETE CASCADE ON UPDATE CASCADE" .
+            ");";
         // execute query and do error handling
         if ($db->query($query) != true) {
             return "couldn't create table '" . db_config::TABLE_DISCIPLINE . "': " . $db->error;
@@ -171,17 +199,20 @@ class adapterGeneric
         // --- Results Table ---
 
         // make query for TABLE_RESULT
-        $query  = "create table IF NOT EXISTS " . db_config::TABLE_RESULT . " ( ";
-        $query .= db_kwd::RESULT_ID .                   " INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ";                                         // Id of result (INT is enough)
-        $query .= db_kwd::RESULT_TIMESTAMP .            " TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), ";    // timestamp for calculating deltas
-        $query .= db_kwd::RESULT_DISCIPLINE .           " integer NOT NULL, ";                                                                // id of the discipline
-        $query .= db_kwd::RESULT_START_NUMBER .         " SMALLINT UNSIGNED, ";                                                               // 0 in case of Twitter
-        $query .= db_kwd::RESULT_NAME .                 " text, ";
-        $query .= db_kwd::RESULT_CLUB .                 " text, ";                                                                            // empty in case of Twitter
-        $query .= db_kwd::RESULT_SCORE_SUBMITTED .      " float, ";                                                                           // -1 in case of Twitter
-        $query .= db_kwd::RESULT_SCORE_ACCOMPLISHED .   " float, ";
-        $query .= db_kwd::RESULT_TIME .                 " SMALLINT UNSIGNED, ";                                                               // time in seconds, -99 if finished
-        $query .= db_kwd::RESULT_FINISHED .             " TINYINT(1) NOT NULL )";                                                             // 0 ongoing, 1 done
+        $query = "create table IF NOT EXISTS " . db_config::TABLE_RESULT . " ( " .
+            db_kwd::RESULT_ID .                   " INT NOT NULL AUTO_INCREMENT, " .                                                     // Id of result (INT is enough)
+            db_kwd::RESULT_TIMESTAMP .            " TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(), " .    // timestamp for calculating deltas
+            db_kwd::RESULT_DISCIPLINE .           " INT NOT NULL, " .                                                                // id of the discipline
+            db_kwd::RESULT_START_NUMBER .         " SMALLINT UNSIGNED, " .                                                               // 0 in case of Twitter
+            db_kwd::RESULT_NAME .                 " text, " .
+            db_kwd::RESULT_CLUB .                 " text, " .                                                                            // empty in case of Twitter
+            db_kwd::RESULT_SCORE_SUBMITTED .      " float, " .                                                                           // -1 in case of Twitter
+            db_kwd::RESULT_SCORE_ACCOMPLISHED .   " float, " .
+            db_kwd::RESULT_TIME .                 " SMALLINT UNSIGNED DEFAULT 0, " .                                                     // time in seconds
+            db_kwd::RESULT_FINISHED .             " TINYINT(1) NOT NULL DEFAULT 1, " .                                                   // 0 ongoing, 1 done
+            "PRIMARY KEY (" . db_kwd::RESULT_ID . "), " .
+            "FOREIGN KEY (" . db_kwd::RESULT_DISCIPLINE . ") REFERENCES " . db_config::TABLE_DISCIPLINE . "(" . db_kwd::DISCIPLINE_ID . ") ON DELETE CASCADE ON UPDATE CASCADE" .
+            ");";
 
         // execute query and do error handling
         if ($db->query($query) != true) {
@@ -232,29 +263,24 @@ class adapterGeneric
     /**
      * Cleans database by searching for elements that lack a parent and removing it.
      * 
-     * In the best case no elements are removed (given $strict = false),
-     * this means that the code works fine and the cleaning tasks in the adapters do their job correctly.
-     * Please note the action is quiet intense for the database, so only run it if it is required.
+     * Warning, this operation might be database intense so only run it if necessary
      * 
      * @param mysqli $db The database to clean
-     * @param bool $strict true: remove competitions whose users got deleted (and also delete all competitions with user=0)
-     *                     false: assign user 0 to all competitions where the user got deleted
-     * 
-     * @return array The deleted elements (only id's)
-     * 
-     * @todo implement
      */
-    /*public static function cleanDatabase(mysqli $db, bool $strict = false): array
+    public static function optimize(mysqli $db): void
     {
-        // don't store any id's in this script do it entirely with query's (if the database get's big memory problems might occur)
+        // OPTIMIZE TABLE users; 
 
-        // do optimization
-        https://forums.mysql.com/read.php?28,247289,249191#msg-249191
-        
-        // do deletion with join
-        https://dev.mysql.com/doc/refman/8.0/en/delete.html
-        https://stackoverflow.com/questions/17083862/mysql-delete-row-where-parent-does-not-exist
+        // optimize users
+        $db->query("OPTIMIZE TABLE " . db_config::TABLE_USER);
 
-        return [];
-    }*/
+        // optimize competitions
+        $db->query("OPTIMIZE TABLE " . db_config::TABLE_COMPETITION);
+
+        // optimize disciplines
+        $db->query("OPTIMIZE TABLE " . db_config::TABLE_DISCIPLINE);
+
+        // optimize results
+        $db->query("OPTIMIZE TABLE " . db_config::TABLE_RESULT);
+    }
 }

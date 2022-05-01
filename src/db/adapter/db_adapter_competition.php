@@ -156,6 +156,10 @@ class adapterCompetition implements AdapterInterface
     }
 
     // explained in the interface
+    /**
+     * Note: you can't add a competition where user_id is null,
+     * it gets prevented even though the database would alow for it.
+     */
     public static function add(mysqli $db, array $competitions): array
     {
         // empty return array
@@ -195,6 +199,10 @@ class adapterCompetition implements AdapterInterface
             $comp_areas = $competition->{competition::KEY_AREAS};
             $comp_feature_set = $competition->{competition::KEY_FEATURE_SET};
             $comp_live = $competition->{competition::KEY_LIVE};
+
+            // prevent writing of competitions with no user (it happens quietly!!!)
+            if ($comp_user == null)
+                continue;
 
             if (!$statement->execute()) {
                 error_log("error while writing competition to database");
@@ -256,9 +264,6 @@ class adapterCompetition implements AdapterInterface
     }
 
     // explained in the interface
-    /**
-     * @todo implement garbage collection (remove all child's assigned to this representative)
-     */
     public static function remove(mysqli $db, array $competitions): void
     {
         // prepare statement
@@ -270,5 +275,26 @@ class adapterCompetition implements AdapterInterface
             $ID = $competition->{competition::KEY_ID};
             $statement->execute();
         }
+    }
+
+    /**
+     * Cleans the database from competitions whose user got deleted (and therefore the user_id is set to null)
+     * 
+     * @param mysqli $db The database to work with
+     * 
+     * @return bool|int bool (probably false) if the query didn't succeed, else int with the affected rows (number of competitions removed)
+     */
+    public static function clean(mysqli $db): bool|int
+    {
+        // no prepared statement is needed
+        // remove all competitions where the user_id is null
+        $result = $db->query("DELETE FROM "  . db_config::TABLE_COMPETITION . " WHERE " . db_kwd::COMPETITION_USER . " = NULL");
+
+        // if $result is boolean return it's value (value is probably false)
+        if (is_bool($result))
+            return $result;
+
+        // return the number of affected rows
+        return $result->num_rows;
     }
 }
