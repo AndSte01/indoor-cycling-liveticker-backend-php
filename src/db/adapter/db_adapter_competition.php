@@ -276,4 +276,25 @@ class adapterCompetition implements AdapterInterface
             $statement->execute();
         }
     }
+
+    /**
+     * Cleans the database from competitions whose user got deleted (and therefore the user_id is set to null)
+     * 
+     * @param mysqli $db The database to work with
+     * 
+     * @return bool|int bool (probably false) if the query didn't succeed, else int with the affected rows (number of competitions removed)
+     */
+    public static function clean(mysqli $db): bool|int
+    {
+        // no prepared statement is needed
+        // remove all competitions where the user_id is null
+        $result = $db->query("DELETE FROM "  . db_config::TABLE_COMPETITION . " WHERE " . db_kwd::COMPETITION_USER . " = NULL");
+
+        // if $result is boolean return it's value (value is probably false)
+        if (is_bool($result))
+            return $result;
+
+        // return the number of affected rows
+        return $result->num_rows;
+    }
 }
