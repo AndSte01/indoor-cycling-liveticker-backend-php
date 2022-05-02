@@ -29,7 +29,7 @@ class errors
     const INVALID_JSON = "INVALID_JSON";
     /** @var string  access for the desired resource was denied */
     const ACCESS_DENIED = "ACCESS_DENIED";
-    /** @var string Authentication information is required but wasn't send */
+    /** @var string authentication information is required but wasn't send */
     const AUTHENTICATION_REQUIRED = "AUTHENTICATION_REQUIRED";
     /** @var string the resource you're trying to add already exists */
     const ALREADY_EXISTS = "ALREADY_EXISTS";
@@ -37,8 +37,10 @@ class errors
     const INVALID_REQUEST = "INVALID_REQUEST";
     /** @var string your request response contained invalid characters */
     const INVALID_CHARACTERS = "INVALID_CHARACTERS";
-    /** @var string The server encountered an internal error */
+    /** @var string the server encountered an internal error */
     const INTERNAL_ERROR = "INTERNAL_ERROR";
+    /** @var string the elements parent isn't the parent you specified, or the parent you wanted to attach the child to doesn't exist */
+    const INVALID_PARENT = "INVALID_PARENT";
 
     /**
      * Convert an array of different errors into an string
