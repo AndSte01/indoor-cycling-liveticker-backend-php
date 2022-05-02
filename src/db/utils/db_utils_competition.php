@@ -11,7 +11,6 @@ namespace db\utils;
 
 // define aliases
 use errors;
-use managerCompetition;
 use managerCompetitionInterface;
 
 // import required filed
@@ -29,19 +28,19 @@ require_once(dirname(__FILE__) . "/../../errors.php");
 function competitionErrorsToString(int $error, bool $prepareDie = false): string
 {
     switch ($error) {
-        case managerCompetition::ERROR_ALREADY_EXISTING:
+        case managerCompetitionInterface::ERROR_ALREADY_EXISTING:
             return errors::to_error_string([errors::ALREADY_EXISTS], $prepareDie);
 
-        case managerCompetition::ERROR_MISSING_INFORMATION:
+        case managerCompetitionInterface::ERROR_MISSING_INFORMATION:
             return errors::to_error_string([errors::MISSING_INFORMATION], $prepareDie);
 
-        case managerCompetition::ERROR_NOT_EXISTING:
+        case managerCompetitionInterface::ERROR_NOT_EXISTING:
             return errors::to_error_string([errors::NOT_EXISTING], $prepareDie);
 
-        case managerCompetition::ERROR_OUT_OF_RANGE:
+        case managerCompetitionInterface::ERROR_OUT_OF_RANGE:
             return errors::to_error_string([errors::PARAM_OUT_OF_RANGE], $prepareDie);
 
-        case managerCompetition::ERROR_WRONG_USER_ID:
+        case managerCompetitionInterface::ERROR_WRONG_USER_ID:
             return errors::to_error_string([errors::ACCESS_DENIED], $prepareDie);
 
         default:
