@@ -13,6 +13,7 @@ namespace IO\discipline;
 
 // define aliases
 use DateTime;
+use db\adapterCompetition;
 use db\discipline;
 use db\user;
 use errors;
@@ -24,6 +25,7 @@ use mysqli;
 use db\adapterGeneric;
 use function db\utils\authenticationErrorsToString;
 use function db\utils\competitionErrorsToString;
+use function db\utils\disciplineErrorsToString;
 
 // Error logging
 // ini_set('display_errors', 1);
@@ -82,6 +84,10 @@ if (!in_array($param_method, ["add", "edit", "remove"]))
 
 // connect to database
 $db = adapterGeneric::connect();
+
+// check if competition exists
+if (adapterCompetition::search($db, true, $param_competition_id) == null)
+    die(errors::to_error_string([errors::INVALID_PARENT]));
 
 // create user manager and authentication manager
 $user_manager = new managerUser($db);
@@ -207,17 +213,17 @@ function parseVerifyModifyDiscipline(string $json, int $action, int $competition
 
             // do error handling
             if (is_int($result))
-                return competitionErrorsToString($result);
+                return disciplineErrorsToString($result, true);
 
             // if no error ocurred return discipline (in $result) as json
             return json_encode($result, JSON_UNESCAPED_UNICODE);
 
         case 1: // edit
             $result = $discipline_manager->edit($discipline);
-            return competitionErrorsToString($result);
+            return disciplineErrorsToString($result, true);
 
         case 2: // remove
             $result = $discipline_manager->remove($discipline);
-            return competitionErrorsToString($result);
+            return disciplineErrorsToString($result, true);
     }
 }
