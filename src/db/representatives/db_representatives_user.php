@@ -112,19 +112,19 @@ class user implements JsonSerializable, RepresentativeInterface
      * Parse strings into the user.
      * NO CHECKS ARE DONE WETHER THE VALUES ARE USEFUL OR NOT, JUST TYPE-SAFETY.
      * 
-     * @param string $ID Id of the user
-     * @param string $name The name of the user
-     * @param string $password The password of the user
-     * @param mysqli $db Database to make compatible with
+     * @param ?string $ID Id of the user
+     * @param ?string $name The name of the user
+     * @param ?string $password The password of the user
+     * @param ?mysqli $db Database to make compatible with
      * 
      * @return int the errors occurred during parsing
      */
     public function parse(
-        string $ID = "",
-        string $name = "",
-        string $password = "",
-        string $role = "",
-        mysqli $db = null
+        ?string $ID = "",
+        ?string $name = "",
+        ?string $password = "",
+        ?string $role = "",
+        ?mysqli $db = null
     ): int {
         // after parsing no user isDbReady
         $this->isDbReady = false;
@@ -133,8 +133,8 @@ class user implements JsonSerializable, RepresentativeInterface
         $error = 0;
 
         // write string
-        $this->data[self::KEY_NAME] = $name;
-        $this->data[self::KEY_PASSWORD] = $password;
+        $this->data[self::KEY_NAME] = strval($name);
+        $this->data[self::KEY_PASSWORD] = strval($password);
 
         // parsing integers
         $this->data[self::KEY_ID] = intval($ID);

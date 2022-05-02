@@ -190,28 +190,28 @@ class competition implements JsonSerializable, RepresentativeChildInterface
      * Parse strings into the competition
      * NO CHECKS ARE DONE WETHER THE VALUES ARE USEFUL OR NOT, JUST TYPE-SAFETY.
      * 
-     * @param string $ID ID of the competition
-     * @param string $date Date of the competition
-     * @param string $name Name of the competition
-     * @param string $location Location of the competition
-     * @param string $user ID of the user the competition is assigned to
-     * @param string $areas Number of areas of the competition
-     * @param string $feature_set Feature set of the competition
-     * @param string $live Wether competition is live or not
-     * @param mysqli $db Database to make compatible with
+     * @param ?string $ID ID of the competition
+     * @param ?string $date Date of the competition
+     * @param ?string $name Name of the competition
+     * @param ?string $location Location of the competition
+     * @param ?string $user ID of the user the competition is assigned to
+     * @param ?string $areas Number of areas of the competition
+     * @param ?string $feature_set Feature set of the competition
+     * @param ?string $live Wether competition is live or not
+     * @param ?mysqli $db Database to make compatible with
      * 
      * @return int the errors occurred during parsing
      */
     public function parse(
-        string $ID = "",
-        string $date = "",
-        string $name = "",
-        string $location = "",
-        string $user = "",
-        string $areas = "",
-        string $feature_set = "",
-        string $live = "",
-        mysqli $db = null
+        ?string $ID = "",
+        ?string $date = "",
+        ?string $name = "",
+        ?string $location = "",
+        ?string $user = "",
+        ?string $areas = "",
+        ?string $feature_set = "",
+        ?string $live = "",
+        ?mysqli $db = null
     ): int {
         // after parsing no competition isDbReady
         $this->isDbReady = false;
@@ -229,8 +229,8 @@ class competition implements JsonSerializable, RepresentativeChildInterface
         }
 
         // write name, location and credential
-        $this->data[self::KEY_NAME] = $name;
-        $this->data[self::KEY_LOCATION] = $location;
+        $this->data[self::KEY_NAME] = strval($name);
+        $this->data[self::KEY_LOCATION] = strval($location);
 
         // parsing id, areas, feature_set and live
         $this->data[self::KEY_ID] = intval($ID);

@@ -218,32 +218,32 @@ class result implements JsonSerializable, RepresentativeChildInterface
     /**
      * Parse strings into the result
      * 
-     * @param string $ID Id of the result
-     * @param string $timestamp the timestamp of the last modification of the result in the database
-     * @param string $discipline_id ID of the discipline the result is assigned to
-     * @param string $start_number The start number of the competitor
-     * @param string $name The name of the competitor
-     * @param string $club The club of the competitor
-     * @param string $score_submitted The submitted score of the competitor (NOTE: use '.' as decimal separator)
-     * @param string $score_accomplished The accomplished score of the competitor (NOTE: use '.' as decimal separator)
-     * @param string $time Current time of the competitor
-     * @param string $finished Wether the competitor is done or not
-     * @param mysqli $db Database to make compatible with 
+     * @param ?string $ID Id of the result
+     * @param ?string $timestamp the timestamp of the last modification of the result in the database
+     * @param ?string $discipline_id ID of the discipline the result is assigned to
+     * @param ?string $start_number The start number of the competitor
+     * @param ?string $name The name of the competitor
+     * @param ?string $club The club of the competitor
+     * @param ?string $score_submitted The submitted score of the competitor (NOTE: use '.' as decimal separator)
+     * @param ?string $score_accomplished The accomplished score of the competitor (NOTE: use '.' as decimal separator)
+     * @param ?string $time Current time of the competitor
+     * @param ?string $finished Wether the competitor is done or not
+     * @param ?mysqli $db Database to make compatible with 
      * 
      * @return int the errors occurred during parsing
      */
     public function parse(
-        string $ID = "",
-        string $timestamp = "",
-        string $discipline_id = "",
-        string $start_number = "",
-        string $name = "",
-        string $club = "",
-        string $score_submitted = "",
-        string $score_accomplished = "",
-        string $time = "",
-        string $finished = "",
-        mysqli $db = null
+        ?string $ID = "",
+        ?string $timestamp = "",
+        ?string $discipline_id = "",
+        ?string $start_number = "",
+        ?string $name = "",
+        ?string $club = "",
+        ?string $score_submitted = "",
+        ?string $score_accomplished = "",
+        ?string $time = "",
+        ?string $finished = "",
+        ?mysqli $db = null
     ): int {
         // after parsing no result isDbReady
         $this->isDbReady = false;
@@ -263,8 +263,8 @@ class result implements JsonSerializable, RepresentativeChildInterface
         }
 
         // write string
-        $this->data[self::KEY_NAME] = $name;
-        $this->data[self::KEY_CLUB] = $club;
+        $this->data[self::KEY_NAME] = strval($name);
+        $this->data[self::KEY_CLUB] = strval($club);
 
         // parsing integers
         $this->data[self::KEY_ID] = intval($ID);

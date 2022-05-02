@@ -205,26 +205,26 @@ class discipline implements JsonSerializable, RepresentativeChildInterface
      * Parse strings into the discipline.
      * NO CHECKS ARE DONE WETHER THE VALUES ARE USEFUL OR NOT, JUST TYPE-SAFETY.
      * 
-     * @param string $ID Id of the discipline
-     * @param string $timestamp the timestamp of the last modification of the discipline in the database
-     * @param string $competition_id Id of the competition the discipline is assigned to
-     * @param string $type The type of the discipline (see const KEY_TYPE or documentation od api)
-     * @param string $fallback_name Used in case $type isn't valid or the fronted doesn't support it
-     * @param string $round the round of the competition the discipline is located in
-     * @param string $finished wether a discipline is finished or not
-     * @param mysqli $db Database to make compatible with
+     * @param ?string $ID Id of the discipline
+     * @param ?string $timestamp the timestamp of the last modification of the discipline in the database
+     * @param ?string $competition_id Id of the competition the discipline is assigned to
+     * @param ?string $type The type of the discipline (see const KEY_TYPE or documentation od api)
+     * @param ?string $fallback_name Used in case $type isn't valid or the fronted doesn't support it
+     * @param ?string $round the round of the competition the discipline is located in
+     * @param ?string $finished wether a discipline is finished or not
+     * @param ?mysqli $db Database to make compatible with
      * 
      * @return int the errors occurred during parsing
      */
     public function parse(
-        string $ID = "",
-        string $timestamp = "",
-        string $competition_id = "",
-        string $type = "",
-        string $fallback_name = "",
-        string $round = "",
-        string $finished = "",
-        mysqli $db = null
+        ?string $ID = "",
+        ?string $timestamp = "",
+        ?string $competition_id = "",
+        ?string $type = "",
+        ?string $fallback_name = "",
+        ?string $round = "",
+        ?string $finished = "",
+        ?mysqli $db = null
     ): int {
         // after parsing no discipline isDbReady
         $this->isDbReady = false;
@@ -244,7 +244,7 @@ class discipline implements JsonSerializable, RepresentativeChildInterface
         }
 
         // write fallback_name
-        $this->data[self::KEY_FALLBACK_NAME] = $fallback_name;
+        $this->data[self::KEY_FALLBACK_NAME] = strval($fallback_name);
 
         // parsing integers
         $this->data[self::KEY_ID] = intval($ID);
