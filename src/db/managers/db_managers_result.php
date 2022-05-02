@@ -16,7 +16,7 @@ use db\adapterResult;
 require_once(dirname(__FILE__) . "/../adapter/db_adapter_generic.php");
 require_once(dirname(__FILE__) . "/../adapter/db_adapter_result.php");
 require_once(dirname(__FILE__) . "/../representatives/db_representatives_result.php");
-require_once("db_managers_results_interface.php");
+require_once("db_managers_result_interface.php");
 
 /**
  * A class implementing a result management
