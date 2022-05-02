@@ -56,10 +56,10 @@ class managerDiscipline implements managerDisciplineInterface
     }
 
     // explained in the interface
-    public function getDiscipline(): array
+    public function getDiscipline(DateTime $modified_since = null): array
     {
-        // search for disciplines with the competition id and return them
-        return adapterDiscipline::search($this->db, null, $this->currentCompetitionID);
+        // search for disciplines with corresponding parameters
+        return adapterDiscipline::search($this->db, null, $this->currentCompetitionID, $modified_since);
     }
 
     // explained in the interface
@@ -74,13 +74,6 @@ class managerDiscipline implements managerDisciplineInterface
     {
         // search for disciplines with corresponding parameters
         return adapterDiscipline::search($this->db, null, $this->currentCompetitionID, null, $fallback_name);
-    }
-
-    // explained in the interface
-    public function getDisciplineByTimestamp(DateTime $modified_since): array
-    {
-        // search for disciplines with corresponding parameters
-        return adapterDiscipline::search($this->db, null, $this->currentCompetitionID, $modified_since);
     }
 
     // explained in the interface

@@ -44,9 +44,11 @@ interface managerDisciplineInterface
     /**
      * Searches for all disciplines assigned to the competition id (see setCompetitionId())
      * 
+     * @param DateTime $modified_since The time after which modifications should be returned
+     * 
      * @return discipline[] Array of found disciplines (might be empty)
      */
-    public function getDiscipline(): array;
+    public function getDiscipline(DateTime $modified_since = null): array;
 
     /**
      * Searches for a discipline with the id provided as argument
@@ -67,15 +69,6 @@ interface managerDisciplineInterface
      * @return discipline[] Array of found disciplines (might be empty)
      */
     public function getDisciplineByName(string $fallback_name): array;
-
-    /**
-     * Returns the disciplines of a certain competition (see setCompetitionId()) modified after a certain time.
-     * 
-     * @param DateTime $modified_since The time after which modifications should be returned
-     * 
-     * @return discipline[] Array of found disciplines (might be empty)
-     */
-    public function getDisciplineByTimestamp(DateTime $modified_since): array;
 
     /**
      * Adds a discipline to the database

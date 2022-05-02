@@ -154,7 +154,7 @@ function getDisciplines($competition_id, $timestamp): string
         case (filter_var($timestamp, FILTER_VALIDATE_INT) !== false): // if timestamp is a number try to convert it to unix time
             // create new datetime, convert timestamp to int and apply timestamp to DateTime object
             // get disciplines with the timestamp
-            $result = $discipline_manager->getDisciplineByTimestamp((new DateTime())->setTimestamp(intval($timestamp)));
+            $result = $discipline_manager->getDiscipline((new DateTime())->setTimestamp(intval($timestamp)));
             break;
 
         default: // if limit is neither null nor a number return error
