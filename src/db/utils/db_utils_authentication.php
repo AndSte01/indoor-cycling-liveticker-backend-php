@@ -26,6 +26,7 @@ require_once(dirname(__FILE__) . "/../../errors.php");
  */
 function authenticationErrorsToString(int $error): string
 {
+    // don't use prepareDie, elsewise the authentication headers are overwritten
     switch ($error) {
         case managerAuthenticationInterface::ERROR_DISMISSED_AUTHENTICATION:
             return errors::to_error_string([errors::AUTHENTICATION_REQUIRED]);
