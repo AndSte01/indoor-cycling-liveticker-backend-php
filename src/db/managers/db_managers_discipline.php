@@ -100,7 +100,7 @@ class managerDiscipline implements managerDisciplineInterface
         // add discipline to database
         $result = adapterDiscipline::add($this->db, [$discipline])[0];
 
-        // check if competition was written successfully
+        // check if discipline was written successfully
         if ($result == null)
             return self::ERROR_ADAPTER;
 
@@ -125,7 +125,7 @@ class managerDiscipline implements managerDisciplineInterface
         // edit discipline in database
         $result = adapterDiscipline::edit($this->db, [$discipline])[0];
 
-        // check if competition was written successfully
+        // check if discipline was written successfully
         if ($result == null)
             return self::ERROR_ADAPTER;
 
@@ -156,12 +156,12 @@ class managerDiscipline implements managerDisciplineInterface
     /**
      * Checks wether a discipline can be edited (or removed)
      * 
-     * id is checked as well as the existence of the competition in the database
+     * id is checked as well as the existence of the discipline in the database
      * 
      * @param mysqli $db The database to validate against
-     * @param discipline $disciplineToValidate The competition to validate
+     * @param discipline $disciplineToValidate The discipline to validate
      * 
-     * @return int Return 0 if validation was passed, else ERROR_MISSING_INFORMATION, ERROR_NOT_EXISTING or ERROR_WRONG_USER_ID
+     * @return int Return 0 if validation was passed, else error as int (>1)
      */
     private function validate(mysqli $db, discipline $disciplineToValidate): int
     {
