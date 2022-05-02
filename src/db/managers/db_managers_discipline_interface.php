@@ -13,7 +13,6 @@ use db\discipline;
 
 // add required database tools
 require_once(dirname(__FILE__) . "/../representatives/db_representatives_discipline.php");
-require_once(dirname(__FILE__) . "/../representatives/db_representatives_user.php");
 
 /**
  * Interface used for describing a discipline manager
