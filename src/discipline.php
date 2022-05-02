@@ -157,7 +157,7 @@ function getDisciplines($competition_id, $timestamp): string
             $result = $discipline_manager->getDiscipline((new DateTime())->setTimestamp(intval($timestamp)));
             break;
 
-        default: // if limit is neither null nor a number return error
+        default: // if timestamp is neither null nor a number return error
             return errors::to_error_string([errors::NaN], true);
     }
 
@@ -199,10 +199,10 @@ function parseVerifyModifyDiscipline(string $json, int $action, int $competition
     // use discipline manager to complete task
     $discipline_manager = new managerDiscipline($db, $competitionId);
 
-    // either add, edit or remove competition
+    // either add, edit or remove discipline
     switch ($action) {
         case 0: // add
-            // try to add competition to database
+            // try to add discipline to database
             $result = $discipline_manager->add($discipline);
 
             // do error handling
