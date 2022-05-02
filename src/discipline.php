@@ -86,8 +86,11 @@ if (!in_array($param_method, ["add", "edit", "remove"]))
 $db = adapterGeneric::connect();
 
 // check if competition exists
-if (adapterCompetition::search($db, true, $param_competition_id) == null)
-    die(errors::to_error_string([errors::INVALID_PARENT]));
+if (adapterCompetition::search($db, true, $param_competition_id) == null) {
+    printf(errors::to_error_string([errors::INVALID_PARENT]));
+    $db->close();
+    exit();
+}
 
 // create user manager and authentication manager
 $user_manager = new managerUser($db);
@@ -97,34 +100,47 @@ $authentication_manager = new managerAuthentication($user_manager, $realm);
 $result = $authentication_manager->initiateLoginRoutine();
 
 // check if login was successful, else die with error as string
-if ($result != 0)
-    die(authenticationErrorsToString($result));
+if ($result != 0) {
+    printf(authenticationErrorsToString($result));
+    $db->close();
+    exit();
+}
 
 // verify if user has access to desired competition
 $competition_manager = new managerCompetition($db);
 $competition_manager->setCurrentUserId($authentication_manager->getCurrentUser()->{user::KEY_ID});
 
 $errors = $competition_manager->userHasAccess($param_competition_id);
-if ($errors != 0)
-    die(competitionErrorsToString($errors, true));
+if ($errors != 0) {
+    printf(competitionErrorsToString($errors, true));
+    $db->close();
+    exit();
+}
 
 // decide what the user want's todo
 switch ($param_method) {
     case "add":
-        die(parseVerifyModifyDiscipline($json, 0, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        printf(parseVerifyModifyDiscipline($json, 0, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        $db->close();
+        exit();
 
     case "edit":
-        die(parseVerifyModifyDiscipline($json, 1, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        printf(parseVerifyModifyDiscipline($json, 1, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        $db->close();
+        exit();
 
     case "remove":
-        die(parseVerifyModifyDiscipline($json, 2, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
-        break;
+        printf(parseVerifyModifyDiscipline($json, 2, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        $db->close();
+        exit();
 
     default:
+        $db->close();
         exit();
 }
 
 // unnecessary but safe is safe
+$db->close();
 exit();
 
 

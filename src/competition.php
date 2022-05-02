@@ -86,26 +86,36 @@ $authentication_manager = new managerAuthentication($user_manager, $realm);
 $result = $authentication_manager->initiateLoginRoutine();
 
 // check if login was successful, else die with error as string
-if ($result != 0)
-    die(authenticationErrorsToString($result));
+if ($result != 0) {
+    printf(authenticationErrorsToString($result));
+    $db->close();
+    exit();
+}
 
 // decide what the user want's todo
 switch ($param_method) {
     case "add":
-        die(parseVerifyModifyCompetition($json, 0, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        printf(parseVerifyModifyCompetition($json, 0, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        $db->close();
+        exit();
 
     case "edit":
-        die(parseVerifyModifyCompetition($json, 1, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        printf(parseVerifyModifyCompetition($json, 1, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        $db->close();
+        exit();
 
     case "remove":
-        die(parseVerifyModifyCompetition($json, 2, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
-        break;
+        printf(parseVerifyModifyCompetition($json, 2, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        $db->close();
+        exit();
 
     default:
+        $db->close();
         exit();
 }
 
 // unnecessary but safe is safe
+$db->close();
 exit();
 
 // --- functions used above ---

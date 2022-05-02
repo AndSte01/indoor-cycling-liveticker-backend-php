@@ -58,8 +58,11 @@ if ($param_method == "add") {
     $user = parseVerifyUser($json);
 
     // check if any error string was returned, and die with the error string
-    if (is_string($user))
-        die($user);
+    if (is_string($user)) {
+        printf($user);
+        $db->close();
+        exit();
+    }
 
     // now we know, the user was parsed successfully and $user is of type user
 
@@ -70,10 +73,14 @@ if ($param_method == "add") {
     $error = $user_manager->add($user);
 
     //check for any errors
-    if ($error != 0)
-        die(userErrorsToString($error));
+    if ($error != 0) {
+        printf(userErrorsToString($error));
+        $db->close();
+        exit();
+    }
 
     // if no errors happened die with success message
+    $db->close();
     die(errors::to_error_string([errors::SUCCESS]));
 }
 
@@ -91,24 +98,33 @@ if ($param_method == "logout")
 $result = $authentication_manager->initiateLoginRoutine();
 
 // check if login was successful, else die with error as string
-if ($result != 0)
-    die(authenticationErrorsToString($result));
+if ($result != 0) {
+    printf(authenticationErrorsToString($result));
+    $db->close();
+    exit();
+}
 
 // decide how to proceed
 switch ($param_method) {
     case null:
         // if method is null, a successful authentication is all we are looking for
-        die(errors::to_error_string([errors::SUCCESS]));
+        printf(errors::to_error_string([errors::SUCCESS]));
+        $db->close();
+        exit();
 
     case "remove":
         // get the currently logged in user and remove it
         $errors = $user_manager->remove($authentication_manager->getCurrentUser());
 
         // some error handling
-        if ($errors != 0)
-            die(userErrorsToString($errors));
+        if ($errors != 0) {
+            printf(userErrorsToString($errors));
+            $db->close();
+            exit();
+        }
 
         // if everything went right return success error
+        $db->close();
         die(errors::to_error_string([errors::SUCCESS]));
 
     case "edit":
@@ -116,17 +132,24 @@ switch ($param_method) {
         $user = parseVerifyUser($json);
 
         // check if any error string was returned, and die with the error string
-        if (is_string($user))
-            die($user);
+        if (is_string($user)) {
+            printf($user);
+            $db->close();
+            exit();
+        }
 
         // now we know, the user was parsed successfully and $user is of type user
         $errors = $user_manager->edit($authentication_manager->getCurrentUser(), $user);
 
         //check for any errors
-        if ($error != 0)
-            die(userErrorsToString($error));
+        if ($error != 0) {
+            printf(userErrorsToString($error));
+            $db->close();
+            exit();
+        }
 
         // if no errors happened die with success message
+        $db->close();
         die(errors::to_error_string([errors::SUCCESS]));
 }
 
