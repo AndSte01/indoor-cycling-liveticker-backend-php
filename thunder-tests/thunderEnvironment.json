@@ -1,0 +1,16 @@
+[
+  {
+    "_id": "f43187c2-9a1e-47bb-8f08-30cefd95a733",
+    "name": "liveticker",
+    "default": true,
+    "sortNum": 10000,
+    "created": "2022-05-17T20:00:07.818Z",
+    "modified": "2022-05-17T20:00:38.621Z",
+    "data": [
+      {
+        "name": "url",
+        "value": "localhost/liveticker"
+      }
+    ]
+  }
+]

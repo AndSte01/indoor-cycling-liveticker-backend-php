@@ -1,0 +1,95 @@
+[
+  {
+    "_id": "553ea771-8264-4416-9409-fc512b8565ef",
+    "colId": "b301364b-1edd-4471-b159-22c2c28fe81b",
+    "containerId": "",
+    "name": "invalid request due to missing parameter",
+    "url": "http://{{url}}/setup_db.php",
+    "method": "GET",
+    "sortNum": 10000,
+    "created": "2022-05-17T20:02:50.849Z",
+    "modified": "2022-05-17T20:02:50.849Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "INVALID_REQUEST"
+      }
+    ]
+  },
+  {
+    "_id": "54d0d911-c480-4e95-b935-1289abddf2bc",
+    "colId": "b301364b-1edd-4471-b159-22c2c28fe81b",
+    "containerId": "",
+    "name": "create tables",
+    "url": "http://{{url}}/setup_db.php?create",
+    "method": "GET",
+    "sortNum": 20000,
+    "created": "2022-05-17T20:03:37.046Z",
+    "modified": "2022-05-17T20:04:08.087Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "create",
+        "value": "",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "SUCCESS"
+      }
+    ]
+  },
+  {
+    "_id": "96c4e67f-4f1e-4380-9b65-332e65c7618d",
+    "colId": "b301364b-1edd-4471-b159-22c2c28fe81b",
+    "containerId": "",
+    "name": "drop tables",
+    "url": "http://{{url}}/setup_db.php?drop",
+    "method": "GET",
+    "sortNum": 30000,
+    "created": "2022-05-17T20:04:23.222Z",
+    "modified": "2022-05-17T20:05:08.932Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "drop",
+        "value": "",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "SUCCESS"
+      }
+    ]
+  }
+]
