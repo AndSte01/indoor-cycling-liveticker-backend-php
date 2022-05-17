@@ -132,9 +132,10 @@ class adapterGeneric
      * Sets up the tables of the database
      * 
      * @param mysqli $db Database in which tables are created
-     * @return string error message
+     * 
+     * @return ?string error message on error or null on success
      */
-    public static function createTables(mysqli $db): string
+    public static function createTables(mysqli $db): ?string
     {
         // --- User Table ---
 
@@ -219,7 +220,32 @@ class adapterGeneric
             return "couldn't create table '" . db_config::TABLE_RESULT . "': " . $db->error;
         }
 
-        return "";
+        return null;
+    }
+
+    /**
+     * Function dropping (deleting) all tables.
+     * WARNING: This action might result in irrecoverable data loss
+     * 
+     * @param mysqli $db the database to work with
+     * 
+     * @return ?string error message on failure or null on success
+     */
+    public static function dropTables(mysqli $db): ?string
+    {
+        // create array with table names, the order matters (order by foreign keys)
+        $table_names = [db_config::TABLE_RESULT, db_config::TABLE_DISCIPLINE, db_config::TABLE_COMPETITION, db_config::TABLE_USER];
+
+        // iterate over table names
+        foreach ($table_names as $table_name) {
+            // check if truncating was successful
+            if ($db->query("DROP TABLE " . $table_name) != true)
+                // report error
+                return "couldn't truncate table '" . $table_name . "': " . $db->error;
+        }
+
+        // default return
+        return null;
     }
 
     /**
