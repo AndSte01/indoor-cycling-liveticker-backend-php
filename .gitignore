@@ -8,5 +8,8 @@
 # legcy code
 /legacy
 
+# legacy testing
+/testing
+
 # thunderActivity
 thunder-tests/thunderActivity.json
