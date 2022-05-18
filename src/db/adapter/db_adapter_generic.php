@@ -239,7 +239,7 @@ class adapterGeneric
         // iterate over table names
         foreach ($table_names as $table_name) {
             // check if truncating was successful
-            if ($db->query("DROP TABLE " . $table_name) != true)
+            if ($db->query("DROP TABLE IF EXISTS " . $table_name) != true)
                 // report error
                 return "couldn't truncate table '" . $table_name . "': " . $db->error;
         }
