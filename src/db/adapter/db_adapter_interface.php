@@ -44,13 +44,15 @@ interface AdapterInterface
 
     /**
      * Edits representatives passed in the arrays identified by their ID variables.
-     * All fields (except auto generated ones such as id or timestamp) are overwritten
-     * by the values stored in the corresponding representative object
+     * All fields (except auto generated ones such as id or timestamp) specified in $fields
+     * are overwritten by the values stored in the corresponding representative object.
      * 
      * @param mysqli $db Database to work with
-     * @param RepresentativeInterface[] $representatives Array of representatives to add update in database
+     * @param RepresentativeInterface $representative Representative to edit in the database
+     * @param array $fields The fields to update makes partial updates possible, use fields defined in Representative (not those in db_config.php)
      */
-    public static function edit(mysqli $db, array $representatives): void;
+    // object is used instead of RepresentativeInterface so classes implementing a representative can be used as types for the implementing adapter
+    public static function edit(mysqli $db, object $representative, array $fields): void;
 
     /**
      * Removes representatives form teh database
