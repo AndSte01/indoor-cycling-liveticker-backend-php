@@ -38,13 +38,13 @@ class db_config
 class db_kwd
 {
     // for const TABLE_USER
-    const USER_ID                          = "ID";
-    const USER_NAME                        = "name";
-    const USER_ROLE                        = "role";
-    const USER_PASSWORD_HASH               = "password_hash";
-    const USER_PASSWORD_SALT               = "salt";
-    const USER_BEARER_GENERATION_TIMESTAMP = "bearer_timestamp";
-    const USER_BEARER_TOKEN                = "bearer";
+    const USER_ID               = "ID";
+    const USER_NAME             = "name";
+    const USER_ROLE             = "role";
+    const USER_PASSWORD_HASH    = "password_hash";
+    const USER_PASSWORD_SALT    = "password_salt";
+    const USER_BEARER_TIMESTAMP = "bearer_timestamp";
+    const USER_BEARER_TOKEN     = "bearer";
 
     // for const TABLE_COMPETITION
     const COMPETITION_ID          = "ID";
@@ -76,4 +76,15 @@ class db_kwd
     const RESULT_SCORE_ACCOMPLISHED = "score_accomplished";
     const RESULT_TIME               = "time";
     const RESULT_FINISHED           = "finished";
+}
+
+/**
+ * Definition of constants describing properties for the different columns of the database
+ */
+class db_col_prop
+{
+    // for const table user
+    const USER_PASSWORD_HASH_LENGTH = 64; // length in BYTES
+    const USER_PASSWORD_SALT_LENGTH = 64; // length in BYTES
+    const USER_BEARER_TOKEN_LENGTH  = 64; // length in BYTES
 }
