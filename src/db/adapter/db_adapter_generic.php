@@ -141,10 +141,13 @@ class adapterGeneric
 
         // make query for TABLE_USER
         $query = "create table IF NOT EXISTS " . db_config::TABLE_USER . " ( " .
-            db_kwd::USER_ID .          " INT NOT NULL AUTO_INCREMENT, " .              // Id of the user
-            db_kwd::USER_NAME .        " text NOT NULL, " .                            // Username
-            db_kwd::USER_PASSWORD .    " text NOT NULL, " .                            // Password
-            db_kwd::USER_ROLE .        " INT NOT NULL DEFAULT 0, " .                             // Role
+            db_kwd::USER_ID .                          " INT NOT NULL AUTO_INCREMENT, " . // Id of the user
+            db_kwd::USER_NAME .                        " text NOT NULL, " .               // Username
+            db_kwd::USER_ROLE .                        " INT NOT NULL DEFAULT 0, " .      // Role
+            db_kwd::USER_PASSWORD_HASH .               " VARBINARY(64) NOT NULL, " .      // Password hash
+            db_kwd::USER_PASSWORD_SALT .               " VARBINARY(64) NOT NULL, " .      // salt used for hashing password
+            db_kwd::USER_BEARER_GENERATION_TIMESTAMP . " TIMESTAMP, " .                   // Timestamp for the generated bearer token
+            db_kwd::USER_BEARER_TOKEN                . " VARBINARY(64), " .               // bearer token
             "PRIMARY KEY (" . db_kwd::USER_ID . ")" .
             ");";
 

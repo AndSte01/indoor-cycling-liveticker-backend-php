@@ -38,10 +38,13 @@ class db_config
 class db_kwd
 {
     // for const TABLE_USER
-    const USER_ID       = "ID";
-    const USER_NAME     = "name";
-    const USER_PASSWORD = "password";
-    const USER_ROLE     = "role";
+    const USER_ID                          = "ID";
+    const USER_NAME                        = "name";
+    const USER_ROLE                        = "role";
+    const USER_PASSWORD_HASH               = "password_hash";
+    const USER_PASSWORD_SALT               = "salt";
+    const USER_BEARER_GENERATION_TIMESTAMP = "bearer_timestamp";
+    const USER_BEARER_TOKEN                = "bearer";
 
     // for const TABLE_COMPETITION
     const COMPETITION_ID          = "ID";
