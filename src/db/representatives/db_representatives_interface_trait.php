@@ -23,24 +23,6 @@ use mysqli;
 interface RepresentativeInterface
 {
     /**
-     * Checks wether the representative is ready for usage in the database.
-     * If representative is not marked as ready, try to parse it with $db parameter set, or run makeDbReady()
-     * NO CHECKS AGAINST SQL INJECTIONS.
-     * 
-     * @return bool wether representative is ready for database
-     */
-    public function isDbReady(): bool;
-
-    /**
-     * Makes a representative ready for the database by checking the values and their range.
-     * If a value is changed an error will be added to the return.
-     * 
-     * @param mysqli $db Database for which the representative should be tailored to.
-     * @return int sum of errors (each error has his own bit)
-     */
-    public function makeDbReady(mysqli $db): int;
-
-    /**
      * Parse strings into the competition
      * NO CHECKS ARE DONE WETHER THE VALUES ARE USEFUL OR NOT, JUST TYPE-SAFETY.
      * 
@@ -108,14 +90,5 @@ trait RepresentativeTrait
     public function __set($name, $value)
     {
         throw new \Exception("variables in objects implementing representative are read only");
-    }
-
-    /** @var bool store wether the representative is ready for storage in database */
-    protected bool $isDbReady = false;
-
-    // explained in RepresentativeInterface
-    public function isDbReady(): bool
-    {
-        return $this->isDbReady;
     }
 }

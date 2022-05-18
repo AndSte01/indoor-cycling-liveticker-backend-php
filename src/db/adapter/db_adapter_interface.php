@@ -20,7 +20,6 @@ use mysqli;
  */
 interface AdapterInterface
 {
-
     /**
      * Searches for representatives in the database
      * 
@@ -32,7 +31,6 @@ interface AdapterInterface
      * @return RepresentativeInterface[] array of representatives found in the database
      */
     public static function search(mysqli $db): array;
-
 
     /**
      * Adds an array of representatives to the database
@@ -61,4 +59,14 @@ interface AdapterInterface
      * @param RepresentativeInterface[] $representatives Representatives to delete form database
      */
     public static function remove(mysqli $db, array $representatives): void;
+
+    /**
+     * Makes representatives ready for the database
+     * 
+     * @param mysqli $db Database to work with
+     * @param RepresentativeInterface[] &$representatives Reference to array containing the representative that will be made ready for the database
+     * 
+     * @return int[] Array of the errors that happened during the process (Note: array doesn't contain the updated representatives) 
+     */
+    public static function makeRepresentativeDbReady(mysqli $db, array &$representatives): array;
 }
