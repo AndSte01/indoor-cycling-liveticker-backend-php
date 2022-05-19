@@ -49,7 +49,7 @@ interface AdapterInterface
      * 
      * @param mysqli $db Database to work with
      * @param RepresentativeInterface $representative Representative to edit in the database
-     * @param array $fields The fields to update makes partial updates possible, use fields defined in Representative (not those in db_config.php)
+     * @param array $keys The fields to update makes partial updates possible, use fields defined in Representative (not those in db_config.php)
      */
     // object is used instead of RepresentativeInterface so classes implementing a representative can be used as types for the implementing adapter
     public static function edit(mysqli $db, RepresentativeInterface $representative, array $keys): void;
