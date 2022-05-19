@@ -9,7 +9,7 @@
 /legacy
 
 # legacy testing
-/testing
+/testing-legacy
 
 # thunderActivity
 thunder-tests/thunderActivity.json
