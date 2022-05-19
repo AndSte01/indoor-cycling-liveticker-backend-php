@@ -19,6 +19,8 @@ require_once("db_adapter_interface.php");
 require_once(dirname(__FILE__) . "/../representatives/db_representatives_user.php");
 
 // define aliases
+
+use DateTime;
 use mysqli;
 
 /**
@@ -33,7 +35,7 @@ class adapterUser implements AdapterInterface
      * @param ?string $name Name of the user to search for
      * @param ?string $password Password of the user
      */
-    public static function search(mysqli $db, ?int $user_id = null, ?string $name = null, ?string $password = null): array
+    public static function search(mysqli $db, ?int $user_id = null, ?string $name = null): array
     {
         // empty return
         $return = [];
@@ -51,10 +53,6 @@ class adapterUser implements AdapterInterface
             $filter[] = db_kwd::USER_NAME . "=?";
             $parameters[] = $name;
         }
-        if ($password != null) {
-            $filter[] = db_kwd::USER_PASSWORD . "=?";
-            $parameters[] = $password;
-        }
 
         // Make $filter (a) string again!
         if ($filter != null)
@@ -66,42 +64,24 @@ class adapterUser implements AdapterInterface
         $statement = $db->prepare("SELECT " . implode(", ", [
             db_kwd::USER_ID,
             db_kwd::USER_NAME,
-            db_kwd::USER_PASSWORD,
-            db_kwd::USER_ROLE
+            db_kwd::USER_ROLE,
+            db_kwd::USER_PASSWORD_HASH,
+            db_kwd::USER_PASSWORD_SALT,
+            db_kwd::USER_BEARER_TIMESTAMP,
+            db_kwd::USER_BEARER_TOKEN
         ]) .
             " FROM " . db_config::TABLE_USER . " $filter;");
-
-        /**
-         * awful but gets a beautiful replacement with php >8.1
-         * Replacement: remove all bind_param() and replace $statement->execute() with $statement->execute($parameters)
-         */
-        /*switch (count($parameters)) {
-            case 1:
-                $statement->bind_param("s", $parameters[0]);
-                break;
-
-            case 2:
-                $statement->bind_param("ss", $parameters[0], $parameters[1]);
-                break;
-
-            case 2:
-                $statement->bind_param("sss", $parameters[0], $parameters[1], $parameters[2]);
-                break;
-
-            default:
-                break;
-        }*/
 
         // execute statement
         $statement->execute($parameters);
 
         // bind result values to statement
-        $statement->bind_result($_1, $_2, $_3, $_4);
+        $statement->bind_result($_1, $_2, $_3, $_4, $_5, $_6, $_7);
 
         // iterate over results
         while ($statement->fetch()) {
             $entry = new user();
-            $entry->parse($_1, $_2, $_3, $_4, $db);
+            $entry->parse($_1, $_2, $_3, $_4, $_5, $_6, $_7);
 
             // append to list
             $return[] = $entry;
@@ -112,6 +92,11 @@ class adapterUser implements AdapterInterface
     }
 
     // explained in the interface
+    /**
+     * Adds an array of representatives to the database
+     * 
+     * Note: Neither bearer_timestamp nor bearer_token are added, to add those use edit
+     */
     public static function add(mysqli $db, array $users): array
     {
         // empty return array
@@ -121,26 +106,20 @@ class adapterUser implements AdapterInterface
         $statement = $db->prepare("INSERT INTO " . db_config::TABLE_USER . " (" .
             implode(", ", [
                 db_kwd::USER_NAME,
-                db_kwd::USER_PASSWORD,
-                db_kwd::USER_ROLE
+                db_kwd::USER_ROLE,
+                db_kwd::USER_PASSWORD_HASH,
+                db_kwd::USER_PASSWORD_SALT,
             ])
-            . ") VALUES (?, ?, ?);");
-
-        // bind parameters to statement
-        $statement->bind_param(
-            "ssi",
-            $user_name,
-            $user_password,
-            $user_role
-        );
+            . ") VALUES (?, ?, ?, ?);");
 
         // iterate through array of users and add to database
         foreach ($users as &$user) {
-            $user_name = $user->{user::KEY_NAME};
-            $user_password = $user->{user::KEY_PASSWORD};
-            $user_role = $user->{user::KEY_ROLE};
-
-            if (!$statement->execute()) {
+            if (!$statement->execute([
+                $user->{user::KEY_NAME},
+                $user->{user::KEY_ROLE},
+                $user->{user::KEY_PASSWORD_HASH},
+                $user->{user::KEY_PASSWORD_SALT},
+            ])) {
                 error_log("error while writing user to database");
 
                 // prevent rest of the loop from being executed
@@ -155,50 +134,155 @@ class adapterUser implements AdapterInterface
     }
 
     // explained in the interface
-    public static function edit(mysqli $db, array $users): void
+    public static function edit(mysqli $db, RepresentativeInterface $representative, array $keys): void
     {
-        // use prepared statement to prevent SQL injections
-        $statement = $db->prepare("UPDATE " . db_config::TABLE_USER . " SET " .
-            implode(", ", [
-                db_kwd::USER_NAME . "=? ",
-                db_kwd::USER_PASSWORD . "=? ",
-                db_kwd::USER_ROLE . "=? "
-            ])
-            . " WHERE " . db_kwd::USER_ID . "=?");
+        // convert the names of representative fields to database fields
 
-        // bind parameters to statement
-        $statement->bind_param(
-            "ssii",
-            $user_name,
-            $user_password,
-            $user_role,
-            $user_id
-        );
+        // map names together
+        $key_map = [
+            user::KEY_NAME => db_kwd::USER_NAME,
+            user::KEY_ROLE => db_kwd::USER_ROLE,
+            user::KEY_PASSWORD_HASH => db_kwd::USER_PASSWORD_HASH,
+            user::KEY_PASSWORD_SALT => db_kwd::USER_PASSWORD_SALT,
+            user::KEY_BEARER_TIMESTAMP => db_kwd::USER_BEARER_TIMESTAMP,
+            user::KEY_BEARER_TOKEN => db_kwd::USER_BEARER_TOKEN
+        ];
 
-        // iterate through array of users and add to database
-        foreach ($users as &$user) {
-            $user_name = $user->{user::KEY_NAME};
-            $user_password = $user->{user::KEY_PASSWORD};
-            $user_role = $user->{user::KEY_ROLE};
-            $user_id = $user->{user::KEY_ID};
+        // empty arrays to hold fields that should be updated
+        $fields = []; // field names in database containing an additional =? for sql query
+        $params = []; // values to insert in database
 
-            if (!$statement->execute()) {
-                error_log("error while writing user to database");
+        // treat DateTime object separately
+        $array_key_token_timestamp = array_search(user::KEY_BEARER_TIMESTAMP, $keys);
+        if (false !== $array_key_token_timestamp) {
+            // add to fields
+            $fields[] = user::KEY_BEARER_TIMESTAMP . "=? ";
+            // convert to string and add to params
+            $params[] = $representative->{user::KEY_BEARER_TIMESTAMP}->format("Y-m-d H:i:s");
+            // remove key from array to prevent multiple addition
+            unset($keys[$array_key_token_timestamp]);
+        }
+
+        foreach ($keys as $key) {
+            // get mapped key (might be null if fields contained unsupported key)
+            $field = $key_map[$key];
+
+            // add field to update list
+            if ($field != null) {
+                // add string for prepare statement
+                $fields[] = $field . "=? ";
+                // add value to array (Note: use correct key)
+
+                $params[] = $representative->{$key};
             }
         }
+
+        // add id as last value to params
+        $params[] = $representative->{user::KEY_ID};
+
+        // use prepared statement to prevent SQL injections
+        $statement = $db->prepare("UPDATE " . db_config::TABLE_USER . " SET " .
+            implode(", ", $fields)
+            . " WHERE " . db_kwd::USER_ID . "=?");
+
+
+        // execute statement with prepared values
+        $statement->execute($params);
     }
 
     // explained in the interface
-    public static function remove(mysqli $db, array $users): void
+    public static function remove(mysqli $db, array $representatives): void
     {
         // prepare statement
         $statement = $db->prepare("DELETE FROM " . db_config::TABLE_USER . " WHERE " . db_kwd::USER_ID . "=?");
         $statement->bind_param("i", $ID);
 
         // iterate through array and execute statement for different ids
-        foreach ($users as &$user) {
+        foreach ($representatives as &$user) {
             $ID = $user->{user::KEY_ID};
             $statement->execute();
         }
+    }
+
+    // explained int the interface
+    public static function makeRepresentativeDbReady(mysqli $db, array &$representatives): array
+    {
+        $errors = [];
+
+        foreach ($representatives as &$user) {
+            $new_name = $user->{user::KEY_NAME};
+            $new_role = $user->{user::KEY_ROLE};
+            $new_password_hash = $user->{user::KEY_PASSWORD_HASH};
+            $new_password_salt = $user->{user::KEY_PASSWORD_SALT};
+            $new_bearer_timestamp = $user->{user::KEY_BEARER_TIMESTAMP};
+            $new_bearer_token = $user->{user::KEY_BEARER_TOKEN};
+
+            // variable for error messages
+            $error = 0;
+
+            // check timestamp
+            if ($new_bearer_timestamp == null) {
+                $new_bearer_timestamp = new DateTime();
+                $error |= user::ERROR_BEARER_TIMESTAMP;
+            }
+
+            // check if invalid characters are present in string, if so remove them and add error
+            if (strcmp($new_name, $db->real_escape_string($new_name)) != 0) {
+                $new_name = $db->real_escape_string($new_name);
+                $error |= user::ERROR_NAME;
+            }
+
+            // won't check id, it isn't used when writing to db and if reading from db and id is out of range nothing happens
+
+            // role is >= 0 by design
+            if ($new_role < 0) {
+                $new_role = 0;
+                $error |= user::ERROR_ROLE;
+            }
+
+            // check binary stings for length
+            if (!self::makeStringCorrectLength($new_password_hash, db_col_prop::USER_PASSWORD_HASH_LENGTH))
+                $error |= user::ERROR_PASSWORD_HASH;
+
+            if (!self::makeStringCorrectLength($new_password_salt, db_col_prop::USER_PASSWORD_SALT_LENGTH))
+                $error |= user::ERROR_PASSWORD_SALT;
+
+            if (!self::makeStringCorrectLength($new_bearer_token, db_col_prop::USER_BEARER_TOKEN_LENGTH))
+                $error |= user::ERROR_BEARER_TOKEN;
+
+            // return errors
+            return $error;
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Sets a string to the correct length.
+     * - If it is too short leading zeroes are applied.
+     * - If it is to long it is cropped
+     * 
+     * @param string &$str Reference to the string to work with
+     * @param int $length Desired length of the string
+     * 
+     * @return boolean Wether the string had to be modified or not
+     */
+    private static function makeStringCorrectLength(string &$str, int $length): bool
+    {
+        // check if string is too long and correct length
+        if (strlen($str) > $length) {
+            $str = substr($str, 0, $length - 1);
+            return false;
+        }
+
+        // check if string is too short and correct length
+        if (strlen($str) < $length) {
+            //   is 0x00
+            $str = str_repeat(" ", $length - strlen($str)) . $str;
+            return false;
+        }
+
+        // default return
+        return true;
     }
 }

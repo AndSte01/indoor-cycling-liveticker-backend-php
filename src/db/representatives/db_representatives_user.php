@@ -11,6 +11,7 @@ namespace db;
 require_once("db_representatives_interface_trait.php");
 
 // define aliases
+use DateTime;
 use JsonSerializable;
 use mysqli;
 
@@ -27,18 +28,26 @@ class user implements JsonSerializable, RepresentativeInterface
     public const KEY_ID = "id";
     /** @var string name of the user */
     public const KEY_NAME = "name";
-    /** @var string password of the user */
-    public const KEY_PASSWORD = "password";
     /** @var string role of the user */
     public const KEY_ROLE = "role";
-
+    /** @var string password hash generated using user input and random salt **/
+    public const KEY_PASSWORD_HASH = "password_hash";
+    /** @var string salt used for password hash generation, randomly generated **/
+    public const KEY_PASSWORD_SALT = "password_salt";
+    /** @var string timestamp of token generation (used to limit temporal validity of bearer token) **/
+    public const KEY_BEARER_TIMESTAMP = "bearer_timestamp";
+    /** @var string token used to authenticate **/
+    public const KEY_BEARER_TOKEN = "bearer";
 
     /** @var array data stored in the user */
     protected $data = [
         self::KEY_ID => 0,
         self::KEY_NAME => "",
-        self::KEY_PASSWORD => "",
-        self::KEY_ROLE => 0
+        self::KEY_ROLE => 0,
+        self::KEY_PASSWORD_HASH => b"", // is a string since it can store variable length binary data
+        self::KEY_PASSWORD_SALT => b"", // see above
+        self::KEY_BEARER_TIMESTAMP => null,
+        self::KEY_BEARER_TOKEN => b""   // see above
     ];
 
     // Errors
@@ -46,28 +55,46 @@ class user implements JsonSerializable, RepresentativeInterface
     const ERROR_ID = 1;
     /** @var int Error while parsing the username */
     const ERROR_NAME = 2;
-    /** @var int Error while parsing the password */
-    const ERROR_PASSWORD = 4;
-    /** @var int Error while parsing the password */
-    const ERROR_ROLE = 8;
+    /** @var int Error while parsing the role */
+    const ERROR_ROLE = 4;
+    /** @var int Error while parsing the password hash */
+    const ERROR_PASSWORD_HASH = 8;
+    /** @var int Error while parsing the password salt */
+    const ERROR_PASSWORD_SALT = 16;
+    /** @var int Error while parsing the bearer timestamp */
+    const ERROR_BEARER_TIMESTAMP = 32;
+    /** @var int Error while parsing the bearer token */
+    const ERROR_BEARER_TOKEN = 64;
 
     /**
      * Constructor 
      * 
-     * @param int $ID Id of the user
-     * @param string $name The username
-     * @param string $password The password
+     * @param ?int $ID Id of the user
+     * @param ?string $name The username
+     * @param ?int $role The role of the user
+     * @param ?string $password_hash The BINARY representation of the password hash
+     * @param ?string $password_salt The BINARY representation of the password salt
+     * @param ?DateTime $bearer_timestamp The timestamp of the generated bearer token
+     * @param ?string $bearer_token The BINARY representation of the bearer token
      */
     function __construct(
         int $ID = null,
         string $name = null,
-        string $password = null
+        int $role = null,
+        string $password_hash = null,
+        string $password_salt = null,
+        DateTime $bearer_timestamp = null,
+        string $bearer_token = null,
     ) {
         // this strange way of setting the defaults is used so one can just null all unused fields during construction
         // not relay performant but makes debugging a bit easier
-        $this->data[self::KEY_ID]       = $ID       ?? 0;
-        $this->data[self::KEY_NAME]     = $name     ?? "";
-        $this->data[self::KEY_PASSWORD] = $password ?? "";
+        $this->data[self::KEY_ID]               = $ID               ?? 0;
+        $this->data[self::KEY_NAME]             = $name             ?? "";
+        $this->data[self::KEY_ROLE]             = $role             ?? 0;
+        $this->data[self::KEY_PASSWORD_HASH]    = $password_hash    ?? b"";
+        $this->data[self::KEY_PASSWORD_SALT]    = $password_salt    ?? b"";
+        $this->data[self::KEY_BEARER_TIMESTAMP] = $bearer_timestamp ?? new DateTime();
+        $this->data[self::KEY_BEARER_TOKEN]     = $bearer_token     ?? b"";
     }
 
     // explained in RepresentativeInterface
@@ -77,44 +104,16 @@ class user implements JsonSerializable, RepresentativeInterface
         return $this;
     }
 
-    // explained in RepresentativeInterface
-    public function makeDbReady(mysqli $db): int
-    {
-        // variable for error messages
-        $error = 0;
-
-        // check if invalid characters are present in string, if so remove them and add error
-        if (strcmp($this->{self::KEY_NAME}, $db->real_escape_string($this->{self::KEY_NAME})) != 0) {
-            $this->date[self::KEY_NAME] = $db->real_escape_string($this->{self::KEY_NAME});
-            $error |= self::ERROR_NAME;
-        }
-        if (strcmp($this->{self::KEY_PASSWORD}, $db->real_escape_string($this->{self::KEY_PASSWORD})) != 0) {
-            $this->date[self::KEY_PASSWORD] = $db->real_escape_string($this->{self::KEY_PASSWORD});
-            $error |= self::ERROR_PASSWORD;
-        }
-
-        // won't check id, it isn't used when writing to db and if reading from db and id is out of range nothing happens
-
-        // role is >= 0 b< design
-        if ($this->{self::KEY_ROLE} < 0) {
-            $data[self::KEY_ROLE] = 0;
-            $error |= self::ERROR_ROLE;
-        }
-
-        // mark user as ready for database
-        $this->isDbReady = true;
-
-        // return errors
-        return $error;
-    }
-
     /**
      * Parse strings into the user.
      * NO CHECKS ARE DONE WETHER THE VALUES ARE USEFUL OR NOT, JUST TYPE-SAFETY.
      * 
      * @param ?string $ID Id of the user
      * @param ?string $name The name of the user
-     * @param ?string $password The password of the user
+     * @param ?string $password_hash The BINARY representation of the password hash
+     * @param ?string $password_salt The BINARY representation of the password salt
+     * @param ?string $bearer_timestamp The timestamp of the generated bearer token
+     * @param ?string $bearer_token The BINARY representation of the bearer token
      * @param ?mysqli $db Database to make compatible with
      * 
      * @return int the errors occurred during parsing
@@ -122,27 +121,27 @@ class user implements JsonSerializable, RepresentativeInterface
     public function parse(
         ?string $ID = "",
         ?string $name = "",
-        ?string $password = "",
         ?string $role = "",
-        ?mysqli $db = null
+        ?string $password_hash = "",
+        ?string $password_salt = "",
+        ?string $bearer_timestamp = "",
+        ?string $bearer_token = ""
     ): int {
-        // after parsing no user isDbReady
-        $this->isDbReady = false;
-
         // variable for error
         $error = 0;
 
         // write string
         $this->data[self::KEY_NAME] = strval($name);
-        $this->data[self::KEY_PASSWORD] = strval($password);
 
         // parsing integers
         $this->data[self::KEY_ID] = intval($ID);
         $this->data[self::KEY_ROLE] = intval($role);
 
-        // if a $db is passed also run makeDbReady()
-        if ($db != null)
-            $error = $error | $this->makeDbReady($db); // add errors together
+        // write binary strings
+        $this->data[self::KEY_PASSWORD_HASH] = $password_hash;
+        $this->data[self::KEY_PASSWORD_SALT] = $password_salt;
+        $this->data[self::KEY_BEARER_TIMESTAMP] = $bearer_timestamp;
+        $this->data[self::KEY_BEARER_TOKEN] = $bearer_token;
 
         // return errors
         return $error;
@@ -158,7 +157,6 @@ class user implements JsonSerializable, RepresentativeInterface
         return [
             self::KEY_ID => $this->{self::KEY_ID},
             self::KEY_NAME => $this->{self::KEY_NAME},
-            self::KEY_PASSWORD => $this->{self::KEY_PASSWORD},
             self::KEY_ROLE => $this->{self::KEY_ROLE}
         ];
     }
@@ -173,10 +171,10 @@ class user implements JsonSerializable, RepresentativeInterface
      * 
      * @see self::usercmp
      */
-    public function isEqual(self $user): int
+    /*public function isEqual(self $user): int
     {
         return self::usercmp($user, $this);
-    }
+    }*/
 
     /**
      * Compares two users and decides wether they are identical or not.
@@ -189,10 +187,13 @@ class user implements JsonSerializable, RepresentativeInterface
      * 
      * @return int 0 if they don't match, 1 if nam and password match, 2 if name, password and id match.
      */
-    public static function usercmp(self $user1, self $user2): int
+    /*public static function usercmp(self $user1, self $user2): int
     {
-        // check if name and password match (if they don't the user isn't equal and 0 is returned)
-        if ($user1->{self::KEY_NAME} != $user2->{self::KEY_NAME} || $user1->{self::KEY_PASSWORD} != $user2->{self::KEY_PASSWORD})
+        // check if name and password_hash match (if they don't the user isn't equal and 0 is returned)
+        if (
+            $user1->{self::KEY_NAME} != $user2->{self::KEY_NAME} ||
+            $user1->{self::KEY_PASSWORD_HASH} != $user2->{self::KEY_PASSWORD_HASH}
+        )
             return 0;
 
         // now check if id does match (if it does return 2 else proceed and return 1)
@@ -201,5 +202,5 @@ class user implements JsonSerializable, RepresentativeInterface
 
         // at this point name and password match but id doesn't so return 1
         return 1;
-    }
+    }*/
 }
