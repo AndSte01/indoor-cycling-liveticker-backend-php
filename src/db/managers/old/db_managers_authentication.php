@@ -23,9 +23,7 @@ require_once(dirname(__FILE__) . "/../../errors.php");
 class managerAuthentication implements managerAuthenticationInterface
 {
     /** @var string name of hash algorithm to use (for php hash() function) */
-    protected const PHP_HASH_ALGORITHM = "sha256";
-    /** @var string name of the hash algorithm to user (for the browser) */
-    protected const BROWSER_HASH_ALGORITHM = "sha-256";
+    protected const PHP_HASH_ALGORITHM = "sha3-256";
 
     /** @var int Length of the nonce (in bytes) used for authentication */
     protected const NONCE_LENGTH = 64;
