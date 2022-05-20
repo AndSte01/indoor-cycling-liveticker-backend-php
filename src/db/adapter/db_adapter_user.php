@@ -210,6 +210,7 @@ class adapterUser implements AdapterInterface
         $errors = [];
 
         foreach ($representatives as &$user) {
+            $old_id = $user->{user::KEY_ID};
             $new_name = $user->{user::KEY_NAME};
             $new_role = $user->{user::KEY_ROLE};
             $new_password_hash = $user->{user::KEY_PASSWORD_HASH};
@@ -250,8 +251,19 @@ class adapterUser implements AdapterInterface
             if (!self::makeStringCorrectLength($new_bearer_token, db_col_prop::USER_BEARER_TOKEN_LENGTH))
                 $error |= user::ERROR_BEARER_TOKEN;
 
-            // return errors
-            return $error;
+            // write out errors
+            $errors[] = $error;
+
+            // overwrite user with new one containing the newly created variables
+            $user = new user(
+                $old_id,
+                $new_name,
+                $new_role,
+                $new_password_hash,
+                $new_password_salt,
+                $new_bearer_timestamp,
+                $new_bearer_token
+            );
         }
 
         return $errors;
