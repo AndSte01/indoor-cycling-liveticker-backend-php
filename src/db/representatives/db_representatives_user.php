@@ -130,6 +130,15 @@ class user implements JsonSerializable, RepresentativeInterface
         // variable for error
         $error = 0;
 
+        // try to generate date from string, if it fails, log error and set date to current date
+        try {
+            $this->data[self::KEY_BEARER_TIMESTAMP] = new DateTime($bearer_timestamp);
+        } catch (\Exception $e) {
+            error_log($e);
+            $this->data[self::KEY_BEARER_TIMESTAMP] = (new DateTime())->setTimestamp(0); // set timestamp to unix 0, that is important!
+            $error |= self::ERROR_BEARER_TIMESTAMP;
+        }
+
         // write string
         $this->data[self::KEY_NAME] = strval($name);
 
@@ -140,7 +149,6 @@ class user implements JsonSerializable, RepresentativeInterface
         // write binary strings
         $this->data[self::KEY_PASSWORD_HASH] = $password_hash;
         $this->data[self::KEY_PASSWORD_SALT] = $password_salt;
-        $this->data[self::KEY_BEARER_TIMESTAMP] = $bearer_timestamp;
         $this->data[self::KEY_BEARER_TOKEN] = $bearer_token;
 
         // return errors
