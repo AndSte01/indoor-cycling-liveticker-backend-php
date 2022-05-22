@@ -220,7 +220,7 @@ class adapterUser implements AdapterInterface
 
         // check timestamp
         if ($new_bearer_timestamp == null) {
-            $new_bearer_timestamp = new DateTime();
+            $new_bearer_timestamp = (new DateTime())->setTimestamp(43201);
             $error |= user::ERROR_BINARY_TIMESTAMP;
         }
 
