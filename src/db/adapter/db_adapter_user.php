@@ -67,8 +67,8 @@ class adapterUser implements AdapterInterface
             db_kwd::USER_ROLE,
             db_kwd::USER_PASSWORD_HASH,
             db_kwd::USER_PASSWORD_SALT,
-            db_kwd::USER_BEARER_TIMESTAMP,
-            db_kwd::USER_BEARER_TOKEN
+            db_kwd::USER_BINARY_TIMESTAMP,
+            db_kwd::USER_BINARY_TOKEN
         ]) .
             " FROM " . db_config::TABLE_USER . " $filter;");
 
@@ -92,11 +92,6 @@ class adapterUser implements AdapterInterface
     }
 
     // explained in the interface
-    /**
-     * Adds an array of representatives to the database
-     * 
-     * Note: Neither bearer_timestamp nor bearer_token are added, to add those use edit
-     */
     public static function add(mysqli $db, array $users): array
     {
         // empty return array
@@ -109,8 +104,10 @@ class adapterUser implements AdapterInterface
                 db_kwd::USER_ROLE,
                 db_kwd::USER_PASSWORD_HASH,
                 db_kwd::USER_PASSWORD_SALT,
+                db_kwd::USER_BINARY_TIMESTAMP,
+                db_kwd::USER_BINARY_TOKEN
             ])
-            . ") VALUES (?, ?, ?, ?);");
+            . ") VALUES (?, ?, ?, ?, ?, ?);");
 
         // iterate through array of users and add to database
         foreach ($users as &$user) {
@@ -119,6 +116,8 @@ class adapterUser implements AdapterInterface
                 $user->{user::KEY_ROLE},
                 $user->{user::KEY_PASSWORD_HASH},
                 $user->{user::KEY_PASSWORD_SALT},
+                $user->{user::KEY_BINARY_TIMESTAMP}->format("Y-m-d H:i:s"),
+                $user->{user::KEY_BINARY_TOKEN}
             ])) {
                 error_log("error while writing user to database");
 
@@ -144,8 +143,8 @@ class adapterUser implements AdapterInterface
             user::KEY_ROLE => db_kwd::USER_ROLE,
             user::KEY_PASSWORD_HASH => db_kwd::USER_PASSWORD_HASH,
             user::KEY_PASSWORD_SALT => db_kwd::USER_PASSWORD_SALT,
-            user::KEY_BEARER_TIMESTAMP => db_kwd::USER_BEARER_TIMESTAMP,
-            user::KEY_BEARER_TOKEN => db_kwd::USER_BEARER_TOKEN
+            user::KEY_BINARY_TIMESTAMP => db_kwd::USER_BINARY_TIMESTAMP,
+            user::KEY_BINARY_TOKEN => db_kwd::USER_BINARY_TOKEN
         ];
 
         // empty arrays to hold fields that should be updated
@@ -153,12 +152,12 @@ class adapterUser implements AdapterInterface
         $params = []; // values to insert in database
 
         // treat DateTime object separately
-        $array_key_token_timestamp = array_search(user::KEY_BEARER_TIMESTAMP, $keys);
+        $array_key_token_timestamp = array_search(user::KEY_BINARY_TIMESTAMP, $keys);
         if (false !== $array_key_token_timestamp) {
             // add to fields
-            $fields[] = user::KEY_BEARER_TIMESTAMP . "=? ";
+            $fields[] = user::KEY_BINARY_TIMESTAMP . "=? ";
             // convert to string and add to params
-            $params[] = $representative->{user::KEY_BEARER_TIMESTAMP}->format("Y-m-d H:i:s");
+            $params[] = $representative->{user::KEY_BINARY_TIMESTAMP}->format("Y-m-d H:i:s");
             // remove key from array to prevent multiple addition
             unset($keys[$array_key_token_timestamp]);
         }
@@ -216,13 +215,13 @@ class adapterUser implements AdapterInterface
         $new_role = $representative->{user::KEY_ROLE};
         $new_password_hash = $representative->{user::KEY_PASSWORD_HASH};
         $new_password_salt = $representative->{user::KEY_PASSWORD_SALT};
-        $new_bearer_timestamp = $representative->{user::KEY_BEARER_TIMESTAMP};
-        $new_bearer_token = $representative->{user::KEY_BEARER_TOKEN};
+        $new_bearer_timestamp = $representative->{user::KEY_BINARY_TIMESTAMP};
+        $new_bearer_token = $representative->{user::KEY_BINARY_TOKEN};
 
         // check timestamp
         if ($new_bearer_timestamp == null) {
             $new_bearer_timestamp = new DateTime();
-            $error |= user::ERROR_BEARER_TIMESTAMP;
+            $error |= user::ERROR_BINARY_TIMESTAMP;
         }
 
         // check if invalid characters are present in string, if so remove them and add error
@@ -246,8 +245,8 @@ class adapterUser implements AdapterInterface
         if (!self::makeStringCorrectLength($new_password_salt, db_col_prop::USER_PASSWORD_SALT_LENGTH))
             $error |= user::ERROR_PASSWORD_SALT;
 
-        if (!self::makeStringCorrectLength($new_bearer_token, db_col_prop::USER_BEARER_TOKEN_LENGTH))
-            $error |= user::ERROR_BEARER_TOKEN;
+        if (!self::makeStringCorrectLength($new_bearer_token, db_col_prop::USER_BINARY_TOKEN_LENGTH))
+            $error |= user::ERROR_BINARY_TOKEN;
 
         // overwrite user with new one containing the newly created variables
         $representative = new user(

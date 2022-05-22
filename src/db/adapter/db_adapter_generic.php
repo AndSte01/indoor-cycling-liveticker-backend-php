@@ -146,8 +146,8 @@ class adapterGeneric
             db_kwd::USER_ROLE .                        " INT NOT NULL DEFAULT 0, " .                                                // Role
             db_kwd::USER_PASSWORD_HASH .               " VARBINARY(" . strval(db_col_prop::USER_PASSWORD_HASH_LENGTH) . ") NOT NULL, " . // Password hash
             db_kwd::USER_PASSWORD_SALT .               " VARBINARY(" . strval(db_col_prop::USER_PASSWORD_SALT_LENGTH) . ") NOT NULL, " . // salt used for hashing password
-            db_kwd::USER_BEARER_TIMESTAMP .            " TIMESTAMP, " .                                                             // Timestamp for the generated bearer token
-            db_kwd::USER_BEARER_TOKEN                . " VARBINARY(" . strval(db_col_prop::USER_BEARER_TOKEN_LENGTH) . "), " .           // bearer token
+            db_kwd::USER_BINARY_TIMESTAMP .            " TIMESTAMP, " .                                                             // Timestamp for the generated bearer token
+            db_kwd::USER_BINARY_TOKEN                . " VARBINARY(" . strval(db_col_prop::USER_BINARY_TOKEN_LENGTH) . "), " .           // bearer token
             "PRIMARY KEY (" . db_kwd::USER_ID . ")" .
             ");";
 

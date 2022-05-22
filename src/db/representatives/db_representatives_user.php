@@ -35,9 +35,9 @@ class user implements JsonSerializable, RepresentativeInterface
     /** @var string salt used for password hash generation, randomly generated **/
     public const KEY_PASSWORD_SALT = "password_salt";
     /** @var string timestamp of token generation (used to limit temporal validity of bearer token) **/
-    public const KEY_BEARER_TIMESTAMP = "bearer_timestamp";
+    public const KEY_BINARY_TIMESTAMP = "binary_timestamp";
     /** @var string token used to authenticate **/
-    public const KEY_BEARER_TOKEN = "bearer";
+    public const KEY_BINARY_TOKEN = "binary_token";
 
     /** @var array data stored in the user */
     protected $data = [
@@ -46,8 +46,8 @@ class user implements JsonSerializable, RepresentativeInterface
         self::KEY_ROLE => 0,
         self::KEY_PASSWORD_HASH => b"", // is a string since it can store variable length binary data
         self::KEY_PASSWORD_SALT => b"", // see above
-        self::KEY_BEARER_TIMESTAMP => null,
-        self::KEY_BEARER_TOKEN => b""   // see above
+        self::KEY_BINARY_TIMESTAMP => null,
+        self::KEY_BINARY_TIMESTAMP => b""   // see above
     ];
 
     // Errors
@@ -62,9 +62,9 @@ class user implements JsonSerializable, RepresentativeInterface
     /** @var int Error while parsing the password salt */
     const ERROR_PASSWORD_SALT = 16;
     /** @var int Error while parsing the bearer timestamp */
-    const ERROR_BEARER_TIMESTAMP = 32;
+    const ERROR_BINARY_TIMESTAMP = 32;
     /** @var int Error while parsing the bearer token */
-    const ERROR_BEARER_TOKEN = 64;
+    const ERROR_BINARY_TOKEN = 64;
 
     /**
      * Constructor 
@@ -93,8 +93,8 @@ class user implements JsonSerializable, RepresentativeInterface
         $this->data[self::KEY_ROLE]             = $role             ?? 0;
         $this->data[self::KEY_PASSWORD_HASH]    = $password_hash    ?? b"";
         $this->data[self::KEY_PASSWORD_SALT]    = $password_salt    ?? b"";
-        $this->data[self::KEY_BEARER_TIMESTAMP] = $bearer_timestamp ?? new DateTime();
-        $this->data[self::KEY_BEARER_TOKEN]     = $bearer_token     ?? b"";
+        $this->data[self::KEY_BINARY_TIMESTAMP] = $bearer_timestamp ?? new DateTime();
+        $this->data[self::KEY_BINARY_TOKEN]     = $bearer_token     ?? b"";
     }
 
     // explained in RepresentativeInterface
@@ -134,14 +134,15 @@ class user implements JsonSerializable, RepresentativeInterface
         if ($bearer_timestamp !== null) {
             // try to generate date from string, if it fails, log error and set date to current date
             try {
-                $this->data[self::KEY_BEARER_TIMESTAMP] = new DateTime($bearer_timestamp);
+                $this->data[self::KEY_BINARY_TIMESTAMP] = new DateTime($bearer_timestamp);
             } catch (\Exception $e) {
                 error_log($e);
-                $this->data[self::KEY_BEARER_TIMESTAMP] = (new DateTime())->setTimestamp(0); // set timestamp to unix 0, that is important!
-                $error |= self::ERROR_BEARER_TIMESTAMP;
+                $this->data[self::KEY_BINARY_TIMESTAMP] = (new DateTime())->setTimestamp(0); // set timestamp to unix 0, that is important!
+                $error |= self::ERROR_BINARY_TIMESTAMP;
             }
         } else {
-            $this->data[self::KEY_BEARER_TIMESTAMP] = (new DateTime())->setTimestamp(0); // set timestamp to unix 0, that is important!
+            $this->data[self::KEY_BINARY_TIMESTAMP] = (new DateTime())->setTimestamp(0); // set timestamp to unix 0, that is important!
+            $error |= self::ERROR_BINARY_TIMESTAMP;
         }
 
         // write string
@@ -154,7 +155,7 @@ class user implements JsonSerializable, RepresentativeInterface
         // write binary strings
         $this->data[self::KEY_PASSWORD_HASH] = $password_hash;
         $this->data[self::KEY_PASSWORD_SALT] = $password_salt;
-        $this->data[self::KEY_BEARER_TOKEN] = $bearer_token;
+        $this->data[self::KEY_BINARY_TOKEN] = $bearer_token;
 
         // return errors
         return $error;
