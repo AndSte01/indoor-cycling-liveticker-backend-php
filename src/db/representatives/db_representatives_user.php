@@ -130,13 +130,18 @@ class user implements JsonSerializable, RepresentativeInterface
         // variable for error
         $error = 0;
 
-        // try to generate date from string, if it fails, log error and set date to current date
-        try {
-            $this->data[self::KEY_BEARER_TIMESTAMP] = new DateTime($bearer_timestamp);
-        } catch (\Exception $e) {
-            error_log($e);
+        // date time from null is deprecated so prevent that
+        if ($bearer_timestamp !== null) {
+            // try to generate date from string, if it fails, log error and set date to current date
+            try {
+                $this->data[self::KEY_BEARER_TIMESTAMP] = new DateTime($bearer_timestamp);
+            } catch (\Exception $e) {
+                error_log($e);
+                $this->data[self::KEY_BEARER_TIMESTAMP] = (new DateTime())->setTimestamp(0); // set timestamp to unix 0, that is important!
+                $error |= self::ERROR_BEARER_TIMESTAMP;
+            }
+        } else {
             $this->data[self::KEY_BEARER_TIMESTAMP] = (new DateTime())->setTimestamp(0); // set timestamp to unix 0, that is important!
-            $error |= self::ERROR_BEARER_TIMESTAMP;
         }
 
         // write string
