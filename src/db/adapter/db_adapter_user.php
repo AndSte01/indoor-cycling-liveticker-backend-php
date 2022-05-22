@@ -205,68 +205,63 @@ class adapterUser implements AdapterInterface
     }
 
     // explained int the interface
-    public static function makeRepresentativeDbReady(mysqli $db, array &$representatives): array
+    public static function makeRepresentativeDbReady(mysqli $db, RepresentativeInterface &$representative): int
     {
-        $errors = [];
+        // variable for storing errors
+        $error = 0;
 
-        foreach ($representatives as &$user) {
-            $old_id = $user->{user::KEY_ID};
-            $new_name = $user->{user::KEY_NAME};
-            $new_role = $user->{user::KEY_ROLE};
-            $new_password_hash = $user->{user::KEY_PASSWORD_HASH};
-            $new_password_salt = $user->{user::KEY_PASSWORD_SALT};
-            $new_bearer_timestamp = $user->{user::KEY_BEARER_TIMESTAMP};
-            $new_bearer_token = $user->{user::KEY_BEARER_TOKEN};
+        // get values from old representative
+        $old_id = $representative->{user::KEY_ID};
+        $new_name = $representative->{user::KEY_NAME};
+        $new_role = $representative->{user::KEY_ROLE};
+        $new_password_hash = $representative->{user::KEY_PASSWORD_HASH};
+        $new_password_salt = $representative->{user::KEY_PASSWORD_SALT};
+        $new_bearer_timestamp = $representative->{user::KEY_BEARER_TIMESTAMP};
+        $new_bearer_token = $representative->{user::KEY_BEARER_TOKEN};
 
-            // variable for error messages
-            $error = 0;
-
-            // check timestamp
-            if ($new_bearer_timestamp == null) {
-                $new_bearer_timestamp = new DateTime();
-                $error |= user::ERROR_BEARER_TIMESTAMP;
-            }
-
-            // check if invalid characters are present in string, if so remove them and add error
-            if (strcmp($new_name, $db->real_escape_string($new_name)) != 0) {
-                $new_name = $db->real_escape_string($new_name);
-                $error |= user::ERROR_NAME;
-            }
-
-            // won't check id, it isn't used when writing to db and if reading from db and id is out of range nothing happens
-
-            // role is >= 0 by design
-            if ($new_role < 0) {
-                $new_role = 0;
-                $error |= user::ERROR_ROLE;
-            }
-
-            // check binary stings for length
-            if (!self::makeStringCorrectLength($new_password_hash, db_col_prop::USER_PASSWORD_HASH_LENGTH))
-                $error |= user::ERROR_PASSWORD_HASH;
-
-            if (!self::makeStringCorrectLength($new_password_salt, db_col_prop::USER_PASSWORD_SALT_LENGTH))
-                $error |= user::ERROR_PASSWORD_SALT;
-
-            if (!self::makeStringCorrectLength($new_bearer_token, db_col_prop::USER_BEARER_TOKEN_LENGTH))
-                $error |= user::ERROR_BEARER_TOKEN;
-
-            // write out errors
-            $errors[] = $error;
-
-            // overwrite user with new one containing the newly created variables
-            $user = new user(
-                $old_id,
-                $new_name,
-                $new_role,
-                $new_password_hash,
-                $new_password_salt,
-                $new_bearer_timestamp,
-                $new_bearer_token
-            );
+        // check timestamp
+        if ($new_bearer_timestamp == null) {
+            $new_bearer_timestamp = new DateTime();
+            $error |= user::ERROR_BEARER_TIMESTAMP;
         }
 
-        return $errors;
+        // check if invalid characters are present in string, if so remove them and add error
+        if (strcmp($new_name, $db->real_escape_string($new_name)) != 0) {
+            $new_name = $db->real_escape_string($new_name);
+            $error |= user::ERROR_NAME;
+        }
+
+        // won't check id, it isn't used when writing to db and if reading from db and id is out of range nothing happens
+
+        // role is >= 0 by design
+        if ($new_role < 0) {
+            $new_role = 0;
+            $error |= user::ERROR_ROLE;
+        }
+
+        // check binary stings for length
+        if (!self::makeStringCorrectLength($new_password_hash, db_col_prop::USER_PASSWORD_HASH_LENGTH))
+            $error |= user::ERROR_PASSWORD_HASH;
+
+        if (!self::makeStringCorrectLength($new_password_salt, db_col_prop::USER_PASSWORD_SALT_LENGTH))
+            $error |= user::ERROR_PASSWORD_SALT;
+
+        if (!self::makeStringCorrectLength($new_bearer_token, db_col_prop::USER_BEARER_TOKEN_LENGTH))
+            $error |= user::ERROR_BEARER_TOKEN;
+
+        // overwrite user with new one containing the newly created variables
+        $representative = new user(
+            $old_id,
+            $new_name,
+            $new_role,
+            $new_password_hash,
+            $new_password_salt,
+            $new_bearer_timestamp,
+            $new_bearer_token
+        );
+
+        // return possible errors
+        return $error;
     }
 
     /**

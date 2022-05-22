@@ -66,9 +66,9 @@ interface AdapterInterface
      * Makes representatives ready for the database
      * 
      * @param mysqli $db Database to work with
-     * @param RepresentativeInterface[] &$representatives Reference to array containing the representative that will be made ready for the database
+     * @param RepresentativeInterface &$representative Reference to representative that will be made ready for the database
      * 
-     * @return int[] Array of the errors that happened during the process (Note: array doesn't contain the updated representatives) 
+     * @return int Array of the errors that happened during the process (Note: array doesn't contain the updated representatives) 
      */
-    public static function makeRepresentativeDbReady(mysqli $db, array &$representatives): array;
+    public static function makeRepresentativeDbReady(mysqli $db, RepresentativeInterface &$representative): int;
 }
