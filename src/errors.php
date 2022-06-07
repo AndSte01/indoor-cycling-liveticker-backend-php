@@ -35,6 +35,8 @@ class errors
     const ALREADY_EXISTS = "ALREADY_EXISTS";
     /** @var string the request made is invalid (in a very generic way) */
     const INVALID_REQUEST = "INVALID_REQUEST";
+    /** @var string the request contained invalid data */
+    const INVALID_DATA = "INVALID_DATA";
     /** @var string your request response contained invalid characters */
     const INVALID_CHARACTERS = "INVALID_CHARACTERS";
     /** @var string the server encountered an internal error */
