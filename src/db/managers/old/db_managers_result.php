@@ -21,7 +21,7 @@ require_once("db_managers_result_interface.php");
 /**
  * A class implementing a result management
  */
-class managerResults implements managerResultInterface
+class managerResultsOld implements managerResultInterface
 {
     /** @var int current competition id */
     protected int $currentDisciplineID;

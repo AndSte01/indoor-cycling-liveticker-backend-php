@@ -22,7 +22,7 @@ require_once("db_managers_user_interface.php");
  * 
  * @todo if update to php 8 use unions
  */
-class managerUser implements managerUserInterface
+class managerUserOld implements managerUserInterface
 {
     /** @var mysqli Database to work with */
     protected mysqli $db;

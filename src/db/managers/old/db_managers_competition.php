@@ -21,7 +21,7 @@ require_once("db_managers_competition_interface.php");
 /**
  * A class implementing an competition management
  */
-class managerCompetition implements managerCompetitionInterface
+class managerCompetitionOld implements managerCompetitionInterface
 {
     /** @var ?int current users id */
     protected ?int $currentUserID = null;

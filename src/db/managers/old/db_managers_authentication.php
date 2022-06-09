@@ -20,7 +20,7 @@ require_once(dirname(__FILE__) . "/../../errors.php");
 /**
  * Helps managing an authentication
  */
-class managerAuthentication implements managerAuthenticationInterface
+class managerAuthenticationOld implements managerAuthenticationInterface
 {
     /** @var string name of hash algorithm to use (for php hash() function) */
     protected const PHP_HASH_ALGORITHM = "sha3-256";

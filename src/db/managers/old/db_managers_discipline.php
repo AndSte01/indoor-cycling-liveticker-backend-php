@@ -21,7 +21,7 @@ require_once("db_managers_discipline_interface.php");
 /**
  * A class implementing a discipline management
  */
-class managerDiscipline implements managerDisciplineInterface
+class managerDisciplineOld implements managerDisciplineInterface
 {
     /** @var int current competition id */
     protected int $currentCompetitionID;
