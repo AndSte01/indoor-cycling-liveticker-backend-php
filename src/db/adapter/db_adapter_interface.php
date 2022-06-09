@@ -58,7 +58,7 @@ interface AdapterInterface
      * Removes representatives form teh database
      * 
      * @param mysqli $db Database to work with
-     * @param RepresentativeInterface[] $representatives Representatives to delete form database
+     * @param RepresentativeInterface[] $representatives Representatives to delete form database (only the id really matters)
      */
     public static function remove(mysqli $db, array $representatives): void;
 
