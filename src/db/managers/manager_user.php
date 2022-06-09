@@ -423,11 +423,11 @@ class managerUser
     }
 
     /**
-     * Resets the binary token of the provided user (like a logout)
+     * Resets the bearer token of the provided user (like a logout)
      * 
      * @param user $user The user whose binary token should be reseted
      */
-    public function resetBinaryToken(user $user): void
+    public function resetBearerToken(user $user): void
     {
         $this->getBinaryToken($user); // getting a new one is equal to resetting it
     }
