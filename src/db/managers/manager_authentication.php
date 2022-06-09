@@ -36,7 +36,7 @@ class managerAuthentication
     /** @var ?string The bearer token of the currently logged in user */
     protected ?string $currentBearerToken = null;
     /** @var bool Wether an authentication routine should be initiated even if correct credentials were passed */
-    // protected bool $forceNewCredentials = false; // not used jet
+    protected bool $forceNewCredentials = false;
 
     // Errors that might happen during authentication
     /** @var int Error if client didn't provide authentication header */
@@ -53,9 +53,8 @@ class managerAuthentication
     public const ERROR_NOT_QUALIFIED = 32;
     /** @var int The client used the wrong authentication method */
     public const ERROR_WRONG_AUTHENTICATION_METHOD = 64;
-
     /** @var int A new authentication was forced by a previous call of logout(), This is not an error but desired behavior */
-    // public const ERROR_FORCED_AUTHENTICATION = 128; // not used
+    public const ERROR_FORCED_AUTHENTICATION = 128;
 
     /** @var int Basic authentication method (see https://datatracker.ietf.org/doc/html/rfc7617) */
     public const AUTHENTICATION_METHOD_BASIC = 1;
@@ -153,20 +152,6 @@ class managerAuthentication
                 throw new OutOfRangeException("The selected authentication method isn't supported");
         }
 
-        // TODO implement logout
-        /*// check if authentication message should be forcefully send
-        if ($this->forceNewCredentials) {
-            // a forced authentication will be sent only once
-            $this->forceNewCredentials = false;
-
-            // send out a new authentication message
-            $this->$setAuthHeader();
-
-
-            // return an error stating that a new authentication was forcefully required and therefor the old credentials don't work any longer
-            return self::ERROR_FORCED_AUTHENTICATION;
-        }*/
-
         // check if authentication information is present
         if (empty($_SERVER["HTTP_AUTHORIZATION"])) {
             // if no authentication data is send (request authentication)
@@ -222,7 +207,6 @@ class managerAuthentication
             return self::ERROR_INVALID_REQUEST;
         }
 
-
         // --- we now have valid (authentication) data, now check if it authenticates a user successfully ---
 
         // handle the different authentication methods
@@ -272,8 +256,6 @@ class managerAuthentication
                     return self::ERROR_INVALID_TOKEN;
                 }
 
-
-
                 // now check if the user meets the minimal qualification
                 if ($auth_result->{user::KEY_ROLE} < $minimum_role) {
                     $this->$setAuthHeader(self::ERROR_NOT_QUALIFIED);
@@ -291,6 +273,23 @@ class managerAuthentication
         // and only when using basic authenticating
         if ($method == self::AUTHENTICATION_METHOD_BASIC)
             $this->currentBearerToken = $this->userManager->getBearerToken($this->currentUser);
+
+        // now check if the user want's to logout, first if the user needs to bee logged in to logout,
+        // secondly you can only create a new bearer token if you know the user
+        // check if authentication message should be forcefully send
+        if ($this->forceNewCredentials) {
+            // a forced authentication will be sent only once
+            $this->forceNewCredentials = false;
+
+            // send out a new authentication message
+            $this->$setAuthHeader();
+
+            // reset bearer token
+            $this->userManager->resetBearerToken($this->currentUser);
+
+            // return an error stating that a new authentication was forcefully required and therefor the old credentials don't work any longer
+            return self::ERROR_FORCED_AUTHENTICATION;
+        }
 
         // at this point everything was ok so return no error (= 0)
         return 0;
@@ -395,5 +394,16 @@ class managerAuthentication
         //                   error="invalid_token",
         //                   error_description="The access token expired"
         header("WWW-Authenticate: Bearer realm=\"" . $this->realm . "\"" . $error_string);
+    }
+
+    /**
+     * Logs the current user out.
+     * 
+     * Resets it's bearer token and forces new login information. Need't to be called before authenticate() is called.
+     */
+    public function logout(): void
+    {
+        // force new login
+        $this->forceNewCredentials = true;
     }
 }
