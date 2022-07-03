@@ -806,5 +806,56 @@
         "value": "UmFzaG1p:0:"
       }
     ]
+  },
+  {
+    "_id": "e2bdf2bc-b984-46b5-854c-6ed1111d3602",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "logout",
+    "url": "http://{{url}}/user.php?method=logout",
+    "method": "GET",
+    "sortNum": 78750,
+    "created": "2022-07-03T17:00:41.355Z",
+    "modified": "2022-07-03T17:02:06.321Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "logout",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "Rashmi",
+        "password": "Sonam"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "401"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "AUTHENTICATION_REQUIRED"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
   }
 ]
