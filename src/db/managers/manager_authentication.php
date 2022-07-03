@@ -77,7 +77,7 @@ class managerAuthentication
     }
 
     /**
-     * Returns the current user (only not null after successful bearer authentication)
+     * Returns the current user
      * 
      * @return user The current user
      */

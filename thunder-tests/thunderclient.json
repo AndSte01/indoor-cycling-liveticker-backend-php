@@ -8,7 +8,7 @@
     "method": "GET",
     "sortNum": 10000,
     "created": "2022-05-17T20:02:50.849Z",
-    "modified": "2022-05-17T20:02:50.849Z",
+    "modified": "2022-07-03T16:13:22.669Z",
     "headers": [],
     "params": [],
     "tests": [
@@ -23,6 +23,12 @@
         "custom": "",
         "action": "contains",
         "value": "INVALID_REQUEST"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
       }
     ]
   },
@@ -35,7 +41,7 @@
     "method": "GET",
     "sortNum": 20000,
     "created": "2022-05-17T20:03:37.046Z",
-    "modified": "2022-05-17T20:04:08.087Z",
+    "modified": "2022-07-03T16:14:11.388Z",
     "headers": [],
     "params": [
       {
@@ -56,6 +62,12 @@
         "custom": "",
         "action": "contains",
         "value": "SUCCESS"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
       }
     ]
   },
@@ -68,7 +80,7 @@
     "method": "GET",
     "sortNum": 30000,
     "created": "2022-05-17T20:04:23.222Z",
-    "modified": "2022-05-17T20:05:08.932Z",
+    "modified": "2022-07-03T16:14:22.226Z",
     "headers": [],
     "params": [
       {
@@ -89,6 +101,709 @@
         "custom": "",
         "action": "contains",
         "value": "SUCCESS"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "87d85549-2f39-4589-b330-e87d724144b0",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "authenticate (no authentication details)",
+    "url": "http://{{url}}/user.php",
+    "method": "GET",
+    "sortNum": 65000,
+    "created": "2022-07-03T16:11:48.410Z",
+    "modified": "2022-07-03T16:35:12.656Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "401"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "AUTHENTICATION_REQUIRED"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "86de3012-2522-4ea3-be07-d41064b186aa",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "invalid method parameters",
+    "url": "http://{{url}}/user.php?method=abc",
+    "method": "GET",
+    "sortNum": 5000,
+    "created": "2022-07-03T16:15:14.335Z",
+    "modified": "2022-07-03T16:17:06.427Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "abc",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "PARAM_OUT_OF_RANGE"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "1df8226e-f453-41fd-b80a-253a9f9ba0f4",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "add user (no json)",
+    "url": "http://{{url}}/user.php?method=add",
+    "method": "POST",
+    "sortNum": 20000,
+    "created": "2022-07-03T16:17:26.568Z",
+    "modified": "2022-07-03T16:19:52.101Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "add",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "INVALID_JSON"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "f4e8e27e-852b-4bfc-864c-e30bf98e9f63",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "add user (json but no/incorrect name field)",
+    "url": "http://{{url}}/user.php?method=add",
+    "method": "POST",
+    "sortNum": 30000,
+    "created": "2022-07-03T16:18:29.508Z",
+    "modified": "2022-07-03T16:26:55.720Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "add",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"names\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "MISSING_INFORMATION"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "6596ded3-e6ef-4a56-8e82-0bd73ec3bd0a",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "add user (json but no/incorrect password field)",
+    "url": "http://{{url}}/user.php?method=add",
+    "method": "POST",
+    "sortNum": 40000,
+    "created": "2022-07-03T16:27:00.020Z",
+    "modified": "2022-07-03T16:27:23.579Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "add",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"passwords\": \"Sonam\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "MISSING_INFORMATION"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "87276a42-8c88-45c7-b02c-38159978d6fe",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "add user",
+    "url": "http://{{url}}/user.php?method=add",
+    "method": "POST",
+    "sortNum": 50000,
+    "created": "2022-07-03T16:27:31.908Z",
+    "modified": "2022-07-03T16:30:41.596Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "add",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "SUCCESS"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "0b5279d7-edf9-44be-a9c9-9d8f49894281",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "add user (that already exists)",
+    "url": "http://{{url}}/user.php?method=add",
+    "method": "POST",
+    "sortNum": 60000,
+    "created": "2022-07-03T16:29:22.444Z",
+    "modified": "2022-07-03T16:36:02.709Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "add",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "ALREADY_EXISTS"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ],
+    "docs": "run add user beforehand to get valid results"
+  },
+  {
+    "_id": "e887e846-4237-4038-8f13-2b18ed3a5f3e",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "authenticate (with bearer token)",
+    "url": "http://{{url}}/user.php",
+    "method": "GET",
+    "sortNum": 70000,
+    "created": "2022-07-03T16:32:46.640Z",
+    "modified": "2022-07-03T16:38:13.168Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "123"
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "401"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "INVALID_REQUEST"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "d43b4faf-375e-4fa3-b80d-26e5736a9bd2",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "edit user (no json)",
+    "url": "http://{{url}}/user.php?method=edit",
+    "method": "POST",
+    "sortNum": 80000,
+    "created": "2022-07-03T16:34:44.629Z",
+    "modified": "2022-07-03T16:51:13.019Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "edit",
+        "isPath": false
+      }
+    ],
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "Rashmi",
+        "password": "Sonam"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "INVALID_JSON"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "c655b59e-dc46-42cd-9acf-b3be64f3ed4f",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "authenticate (wrong username)",
+    "url": "http://{{url}}/user.php",
+    "method": "GET",
+    "sortNum": 75000,
+    "created": "2022-07-03T16:37:25.198Z",
+    "modified": "2022-07-03T16:41:27.303Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "abc",
+        "password": "def"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "401"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "NOT_EXISTING"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "484a0ef4-e99b-4f32-90e1-e9c7c38cb4bf",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "authenticate",
+    "url": "http://{{url}}/user.php",
+    "method": "GET",
+    "sortNum": 77500,
+    "created": "2022-07-03T16:38:58.528Z",
+    "modified": "2022-07-03T16:45:11.075Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "Rashmi",
+        "password": "Sonam"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "UmFzaG1p:0:"
+      }
+    ]
+  },
+  {
+    "_id": "076a7731-81a3-4b36-be29-398509575e96",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "authenticate (wrong password)",
+    "url": "http://{{url}}/user.php",
+    "method": "GET",
+    "sortNum": 76250,
+    "created": "2022-07-03T16:40:27.459Z",
+    "modified": "2022-07-03T16:41:40.583Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "Rashmi",
+        "password": "def"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "401"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "ACCESS_DENIED"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "0732eca8-2011-434d-8079-d945a8b0090c",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "remove user",
+    "url": "http://{{url}}/user.php?method=remove",
+    "method": "GET",
+    "sortNum": 90000,
+    "created": "2022-07-03T16:45:29.788Z",
+    "modified": "2022-07-03T16:57:09.963Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "remove",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "Rashmi",
+        "password": "Sonam1"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "SUCCESS"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "587e6fbd-2fce-4388-90ca-df29592a6b13",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "edit user (json but no/incorrect password field)",
+    "url": "http://{{url}}/user.php?method=edit",
+    "method": "POST",
+    "sortNum": 82500,
+    "created": "2022-07-03T16:51:18.374Z",
+    "modified": "2022-07-03T16:55:29.791Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "edit",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"psswords\": \"Sonam1\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "Rashmi",
+        "password": "Sonam"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "MISSING_INFORMATION"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "5b871acf-9397-452c-b104-7ef015167c07",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "edit user",
+    "url": "http://{{url}}/user.php?method=edit",
+    "method": "POST",
+    "sortNum": 83750,
+    "created": "2022-07-03T16:55:36.776Z",
+    "modified": "2022-07-03T16:56:06.352Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "edit",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"password\": \"Sonam1\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "Rashmi",
+        "password": "Sonam"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "SUCCESS"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "d1711759-5703-4a3f-bdd0-18bb15e5a8d2",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "edit user (authenticate with new password)",
+    "url": "http://{{url}}/user.php",
+    "method": "GET",
+    "sortNum": 86875,
+    "created": "2022-07-03T16:56:18.445Z",
+    "modified": "2022-07-03T16:56:54.452Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "Rashmi",
+        "password": "Sonam1"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "UmFzaG1p:0:"
       }
     ]
   }
