@@ -11,12 +11,15 @@
  * 
  * users table
  * 
- * | column   | typ    | not null | default | extra                        | content                        |
- * | -------- | ------ | :------: | ------- | ---------------------------- | ------------------------------ |
- * | ID       | `INT`  |    X     |         | `AUTO_INCREMENT PRIMARY KEY` | Id of the user                 |
- * | name     | `text` |    X     |         |                              | Name of the user               |
- * | password | `text` |    X     |         |                              | Password of the user           |
- * | role     | `INT`  |    X     | 0       |                              | Role of the user (e. g. Admin) |
+ * | column           | typ             | not null | default | extra                        | content                                   |
+ * | ---------------- | --------------- | :------: | ------- | ---------------------------- | ----------------------------------------- |
+ * | ID               | `INT`           |    X     |         | `AUTO_INCREMENT PRIMARY KEY` | Id of the user                            |
+ * | name             | `text`          |    X     |         |                              | Name of the user                          |
+ * | role             | `INT`           |    X     | 0       |                              | Role of the user (e. g. Admin)            |
+ * | password_hash    | `VARBINARY(64)` |    X     |         |                              | hashed password of the user               |
+ * | password_salt    | `VARBINARY(64)` |    X     |         |                              | salt used for hashing user password       |
+ * | binary_timestamp | `TIMESTAMP`     |          |         |                              | time the binary token was generated       |
+ * | binary_token     | `VARBINARY(64)` |          |         |                              | binary token used as part of bearer token |
  * 
  * 
  * competitions table
@@ -141,12 +144,12 @@ class adapterGeneric
 
         // make query for TABLE_USER
         $query = "create table IF NOT EXISTS " . db_config::TABLE_USER . " ( " .
-            db_kwd::USER_ID .                          " INT NOT NULL AUTO_INCREMENT, " .                                           // Id of the user
-            db_kwd::USER_NAME .                        " text NOT NULL, " .                                                         // Username
-            db_kwd::USER_ROLE .                        " INT NOT NULL DEFAULT 0, " .                                                // Role
+            db_kwd::USER_ID .                          " INT NOT NULL AUTO_INCREMENT, " .                                                // Id of the user
+            db_kwd::USER_NAME .                        " text NOT NULL, " .                                                              // Username
+            db_kwd::USER_ROLE .                        " INT NOT NULL DEFAULT 0, " .                                                     // Role
             db_kwd::USER_PASSWORD_HASH .               " VARBINARY(" . strval(db_col_prop::USER_PASSWORD_HASH_LENGTH) . ") NOT NULL, " . // Password hash
             db_kwd::USER_PASSWORD_SALT .               " VARBINARY(" . strval(db_col_prop::USER_PASSWORD_SALT_LENGTH) . ") NOT NULL, " . // salt used for hashing password
-            db_kwd::USER_BINARY_TIMESTAMP .            " TIMESTAMP, " .                                                             // Timestamp for the generated bearer token
+            db_kwd::USER_BINARY_TIMESTAMP .            " TIMESTAMP, " .                                                                  // Timestamp for the generated bearer token
             db_kwd::USER_BINARY_TOKEN                . " VARBINARY(" . strval(db_col_prop::USER_BINARY_TOKEN_LENGTH) . "), " .           // bearer token
             "PRIMARY KEY (" . db_kwd::USER_ID . ")" .
             ");";
