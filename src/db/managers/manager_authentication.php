@@ -56,6 +56,8 @@ class managerAuthentication
     /** @var int A new authentication was forced by a previous call of logout(), This is not an error but desired behavior */
     public const ERROR_FORCED_AUTHENTICATION = 128;
 
+    /** @var int All Authentication methods can be used to authenticate */
+    public const AUTHENTICATION_METHOD_ANY = 0;
     /** @var int Basic authentication method (see https://datatracker.ietf.org/doc/html/rfc7617) */
     public const AUTHENTICATION_METHOD_BASIC = 1;
     /** @var int Bearer token authentication method (see https://datatracker.ietf.org/doc/html/rfc6750) */
@@ -112,6 +114,7 @@ class managerAuthentication
      * Possible methods are:
      * - Basic Authentication (AUTHENTICATION_METHOD_BASIC) (see https://datatracker.ietf.org/doc/html/rfc7617)
      * - Bearer Authentication (AUTHENTICATION_METHOD_BEARER) (see https://datatracker.ietf.org/doc/html/rfc6750)
+     * - Any of the above mentioned (AUTHENTICATION_METHOD_ANY) (note: you need to provide preferred method as parameter)
      * 
      * No input (other than which method to use) required since all data is provided inside the http header that is analyzed internally.
      * 
@@ -124,17 +127,27 @@ class managerAuthentication
      * 
      * It depends on the method of the authentication wether a current user or a current bearer token can be provided, see the corresponding getters for mor details.
      * 
-     * @param int $method The authentication method to use
+     * Note: you can authenticate twice (the header gets analyzed all over again)
+     * 
+     * @param int $method the authentication method to use
      * @param int $minimum_role the minimum role of the user that is required for successful authentication (only used when utilizing bearer authentication)
+     * @param int $method_preferred the method the client should use if no authentication data is provided and any method is allowed
      * 
      * @throws OutOfRangeException If the selected method isn't in the above mentioned
      * 
      * @return int The errors that happened during authentication, or if none happened 0.
      */
-    public function authenticate(int $method, int $minimum_role = 0): int
+    public function authenticate(int $method, int $minimum_role = 0, int $method_preferred = self::AUTHENTICATION_METHOD_BASIC): int
     {
+        // if any method is allowed temporarily set the internally used method to the preferred one, else use the provided one
+        if ($method == self::AUTHENTICATION_METHOD_ANY) {
+            $method_internally = $method_preferred;
+        } else {
+            $method_internally = $method;
+        }
+
         // map functions for easier use below
-        switch ($method) {
+        switch ($method_internally) {
             case self::AUTHENTICATION_METHOD_BASIC:
                 // send out a new authentication message
                 $setAuthHeader = "setBasicAuthenticationHeader";
@@ -152,6 +165,8 @@ class managerAuthentication
                 throw new OutOfRangeException("The selected authentication method isn't supported");
         }
 
+        // --- 1. do some basic checks of authentication information, independent of the authentication method
+
         // check if authentication information is present
         if (empty($_SERVER["HTTP_AUTHORIZATION"])) {
             // if no authentication data is send (request authentication)
@@ -162,7 +177,7 @@ class managerAuthentication
             return self::ERROR_NO_AUTHENTICATION_INFO;
         }
 
-        // --- authentication information is present, now decode it and check the validity ---
+        // --- 2. authentication information is present, now decode it and check the validity ---
 
         // get authentication header
         $auth_header = $_SERVER["HTTP_AUTHORIZATION"];
@@ -179,15 +194,26 @@ class managerAuthentication
         // check wether the correct authentication method has been used by the client
         switch ($header_content[0]) {
             case "Basic":
+                // if any method was allowed recursively run function with correct method
+                if ($method == self::AUTHENTICATION_METHOD_ANY) {
+                    return $this->authenticate(self::AUTHENTICATION_METHOD_BASIC, $minimum_role);
+                }
+
                 // if other auth method is desired by server return error
-                if ($method != self::AUTHENTICATION_METHOD_BASIC) {
+                if ($method_internally != self::AUTHENTICATION_METHOD_BASIC) {
                     $this->$setAuthHeader(self::ERROR_INVALID_REQUEST);
                     return self::ERROR_WRONG_AUTHENTICATION_METHOD;
                 }
                 break;
 
             case "Bearer":
-                if ($method != self::AUTHENTICATION_METHOD_BEARER) {
+                // if any method was allowed recursively run function with correct method
+                if ($method == self::AUTHENTICATION_METHOD_ANY) {
+                    return $this->authenticate(self::AUTHENTICATION_METHOD_BEARER, $minimum_role);
+                }
+
+                // if other auth method is desired by server return error
+                if ($method_internally != self::AUTHENTICATION_METHOD_BEARER) {
                     $this->$setAuthHeader();
                     return self::ERROR_WRONG_AUTHENTICATION_METHOD;
                 }
@@ -207,10 +233,10 @@ class managerAuthentication
             return self::ERROR_INVALID_REQUEST;
         }
 
-        // --- we now have valid (authentication) data, now check if it authenticates a user successfully ---
+        // --- 3. we now have valid (authentication) data, now check if it authenticates a user successfully ---
 
         // handle the different authentication methods
-        switch ($method) {
+        switch ($method_internally) {
             case self::AUTHENTICATION_METHOD_BASIC:
                 // try authentication
                 $auth_result = $this->userManager->authenticateWithPassword($payload_decoded["username"], $payload_decoded["password"]);
@@ -271,7 +297,7 @@ class managerAuthentication
         $this->isLoggedIn = true;
 
         // and only when using basic authenticating
-        if ($method == self::AUTHENTICATION_METHOD_BASIC)
+        if ($method_internally == self::AUTHENTICATION_METHOD_BASIC)
             $this->currentBearerToken = $this->userManager->getBearerToken($this->currentUser);
 
         // now check if the user want's to logout, first if the user needs to bee logged in to logout,
