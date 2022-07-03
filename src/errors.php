@@ -43,6 +43,8 @@ class errors
     const INTERNAL_ERROR = "INTERNAL_ERROR";
     /** @var string the elements parent isn't the parent you specified, or the parent you wanted to attach the child to doesn't exist */
     const INVALID_PARENT = "INVALID_PARENT";
+    /** @var string the input was invalid (for some undefined reason) */
+    const INVALID_INPUT = "INVALID_INPUT";
 
     /**
      * Convert an array of different errors into an string
