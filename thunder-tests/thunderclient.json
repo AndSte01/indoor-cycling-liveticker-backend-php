@@ -407,7 +407,7 @@
     "method": "GET",
     "sortNum": 70000,
     "created": "2022-07-03T16:32:46.640Z",
-    "modified": "2022-07-03T16:38:13.168Z",
+    "modified": "2022-07-03T19:08:45.550Z",
     "headers": [],
     "params": [],
     "body": {
@@ -417,7 +417,7 @@
     },
     "auth": {
       "type": "bearer",
-      "bearer": "123"
+      "bearer": "UmFzaG1p:0:97T4E5ZhIvPkATCSlrEJ712n/1WheyuhSAbHPI6JWiQQDdQrdlz5KF1B21Bg3TxAF6FVj5/oVZ1qjDmM6rmrJw=="
     },
     "tests": [
       {
@@ -811,12 +811,12 @@
     "_id": "e2bdf2bc-b984-46b5-854c-6ed1111d3602",
     "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
     "containerId": "",
-    "name": "logout",
+    "name": "logout (using basic auth)",
     "url": "http://{{url}}/user.php?method=logout",
     "method": "GET",
     "sortNum": 78750,
     "created": "2022-07-03T17:00:41.355Z",
-    "modified": "2022-07-03T17:02:06.321Z",
+    "modified": "2022-07-03T19:25:14.678Z",
     "headers": [],
     "params": [
       {
@@ -856,6 +856,7 @@
         "action": "isjson",
         "value": ""
       }
-    ]
+    ],
+    "docs": "thesting of logging out with bearer should be tested seperately"
   }
 ]

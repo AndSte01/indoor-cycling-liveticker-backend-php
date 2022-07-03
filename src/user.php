@@ -96,11 +96,14 @@ $user_manager = new managerUser($db);
 $authentication_manager = new managerAuthentication($user_manager, $realm);
 
 // if the user wants to logout do it before initiating new login routine
-if ($param_method == "logout")
+if ($param_method == "logout") {
     $authentication_manager->logout();
-
-// initiated login routine using basic authentication
-$result = $authentication_manager->authenticate(managerAuthentication::AUTHENTICATION_METHOD_BASIC);
+    // also allow authentication with any method for once (but prefer basic)
+    $result = $authentication_manager->authenticate(managerAuthentication::AUTHENTICATION_METHOD_ANY);
+} else {
+    // initiated login routine using basic authentication
+    $result = $authentication_manager->authenticate(managerAuthentication::AUTHENTICATION_METHOD_BASIC);
+}
 
 // check if login was successful, else die with error as string
 if ($result != 0) {
