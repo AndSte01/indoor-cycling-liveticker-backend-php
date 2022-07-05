@@ -139,14 +139,22 @@ class managerAuthentication
      */
     public function authenticate(int $method, int $minimum_role = 0, int $method_preferred = self::AUTHENTICATION_METHOD_BASIC): int
     {
-        // if any method is allowed temporarily set the internally used method to the preferred one, else use the provided one
-        if ($method == self::AUTHENTICATION_METHOD_ANY) {
-            $method_internally = $method_preferred;
-        } else {
-            $method_internally = $method;
+        // --- 1. try to get the required information from the header
+
+        // if a special method (meaning method isn't self::AUTHENTICATION_METHOD_ANY) is defined set it as the preferred one
+        if ($method != self::AUTHENTICATION_METHOD_ANY) {
+            $method_preferred = $method;
         }
 
-        // map functions for easier use below
+        // create placeholder variable for decoded method nad header content
+        $method_internally = 0;
+        $header_content = [];
+
+        // try to decode header, yeah I don't get it either why I used a separate function for that stuff.
+        $header_errors = self::validateDecodeHeader($method_internally, $method, $method_preferred, $header_content);
+
+        // now map the functions for easier use (note: this needs to bee done before handling $header_errors,
+        // elsewise the headers can't be set correctly)
         switch ($method_internally) {
             case self::AUTHENTICATION_METHOD_BASIC:
                 // send out a new authentication message
@@ -165,66 +173,25 @@ class managerAuthentication
                 throw new OutOfRangeException("The selected authentication method isn't supported");
         }
 
-        // --- 1. do some basic checks of authentication information, independent of the authentication method
-
-        // check if authentication information is present
-        if (empty($_SERVER["HTTP_AUTHORIZATION"])) {
-            // if no authentication data is send (request authentication)
-            $this->$setAuthHeader(self::ERROR_INVALID_REQUEST);
-
-            // Text output if user is unwilling to authenticate
-            // die($this->errorProvider::errorsToString(self::ERROR_DISMISSED_AUTHENTICATION));
-            return self::ERROR_NO_AUTHENTICATION_INFO;
-        }
-
-        // --- 2. authentication information is present, now decode it and check the validity ---
-
-        // get authentication header
-        $auth_header = $_SERVER["HTTP_AUTHORIZATION"];
-
-        // split header in parts
-        $header_content = explode(" ", $auth_header);
-
-        // check if enough information is present (assuming e. g. $header_content[0]="Basic" $header_content[1]="MToy")
-        if (count($header_content) < 2) {
-            $this->$setAuthHeader(self::ERROR_INVALID_REQUEST);
-            return self::ERROR_INVALID_REQUEST;
-        }
-
-        // check wether the correct authentication method has been used by the client
-        switch ($header_content[0]) {
-            case "Basic":
-                // if any method was allowed recursively run function with correct method
-                if ($method == self::AUTHENTICATION_METHOD_ANY) {
-                    return $this->authenticate(self::AUTHENTICATION_METHOD_BASIC, $minimum_role);
-                }
-
-                // if other auth method is desired by server return error
-                if ($method_internally != self::AUTHENTICATION_METHOD_BASIC) {
-                    $this->$setAuthHeader(self::ERROR_INVALID_REQUEST);
-                    return self::ERROR_WRONG_AUTHENTICATION_METHOD;
-                }
-                break;
-
-            case "Bearer":
-                // if any method was allowed recursively run function with correct method
-                if ($method == self::AUTHENTICATION_METHOD_ANY) {
-                    return $this->authenticate(self::AUTHENTICATION_METHOD_BEARER, $minimum_role);
-                }
-
-                // if other auth method is desired by server return error
-                if ($method_internally != self::AUTHENTICATION_METHOD_BEARER) {
-                    $this->$setAuthHeader();
-                    return self::ERROR_WRONG_AUTHENTICATION_METHOD;
-                }
-                break;
-
-            default:
+        // handle errors that happened during decoding of the header
+        switch ($header_errors) {
+            case self::ERROR_NO_AUTHENTICATION_INFO:
                 $this->$setAuthHeader(self::ERROR_INVALID_REQUEST);
-                return self::ERROR_INVALID_REQUEST; // if none of the above mentioned methods was used assume invalid request
+                return $header_errors;
+                break;
+
+            case self::ERROR_INVALID_REQUEST:
+                $this->$setAuthHeader(self::ERROR_INVALID_REQUEST);
+                return $header_errors;
+                break;
+
+            case self::ERROR_WRONG_AUTHENTICATION_METHOD:
+                $this->$setAuthHeader(self::ERROR_INVALID_REQUEST);
+                return $header_errors;
                 break;
         }
 
+        // now decode the payload
         $payload_decoded = $this->$decodeHeader($header_content[1]);
 
         // check if decoding was UNsuccessful
@@ -318,6 +285,98 @@ class managerAuthentication
         }
 
         // at this point everything was ok so return no error (= 0)
+        return 0;
+    }
+
+    /**
+     * Function that validates and decodes the header sent to the server.
+     * 
+     * Decoded information is passed by reference, only errors are passed via return.
+     * This function can also check if the client used the authentication scheme desired by the server,
+     * and also wether the desired method is supported by this class.
+     * 
+     * @param int &$method The variable in which the decoded method should bes stored, passed by reference.
+     * @param int $desired_method The method that is desired by the server ($method is set to this value in case the client used the wrong auth scheme)
+     * @param int $fallback_method The method that should be assumed in case the method used by the client couldn't be detected 
+     * @param array &$ header_content The content's of the header that were found during decoding
+     * 
+     * @throws OutOfRangeException If the selected method isn't in the above mentioned
+     * 
+     * @return int the errors that happened during validation and decoding (0 in case of success)
+     */
+    protected function validateDecodeHeader(int &$method, int $desired_method, int $fallback_method, array &$header_content)
+    {
+        // --- 1. do some basic checks of authentication information
+
+        // check if authentication information is present
+        if (empty($_SERVER["HTTP_AUTHORIZATION"])) {
+            // set the method to the fallback method
+            $method = $fallback_method;
+            // return error indication no authentication info was sent by client
+            return self::ERROR_NO_AUTHENTICATION_INFO;
+        }
+
+        // --- 2. authentication information is present, now decode it and check the validity ---
+
+        // get authentication header
+        $auth_header = $_SERVER["HTTP_AUTHORIZATION"];
+
+        // split header in parts
+        $header_content = explode(" ", $auth_header);
+
+        // check if enough information is present (assuming e. g. $header_content[0]="Basic" $header_content[1]="MToy")
+        if (count($header_content) < 2) {
+            // return error indication the request was invalid
+            return self::ERROR_INVALID_REQUEST;
+        }
+
+        // try to find out which authentication message the client used
+        switch ($header_content[0]) {
+            case "Basic":
+                // set method to basic (note: passed by reference)
+                $method = self::AUTHENTICATION_METHOD_BASIC;
+                break;
+
+            case "Bearer":
+                // set method to bearer (note: passed by reference)
+                $method = self::AUTHENTICATION_METHOD_BEARER;
+                break;
+
+            default:
+                // set method to 0 (in hope the returned error is caught correctly)
+                $method = $fallback_method; // set method (passed by reference) to fallback_method
+                return self::ERROR_INVALID_REQUEST; // return error
+                break;
+        }
+
+        // check what authentication method was required and wether the client used it correctly ($method is already checked for being in a valid range)
+        switch ($desired_method) {
+            case self::AUTHENTICATION_METHOD_ANY:
+                // no checks need to be done
+                break;
+
+            case self::AUTHENTICATION_METHOD_BASIC:
+                // if other auth method is desired by server return error
+                if ($method != self::AUTHENTICATION_METHOD_BASIC) {
+                    $method = $desired_method;
+                    return self::ERROR_WRONG_AUTHENTICATION_METHOD;
+                }
+                break;
+
+            case self::AUTHENTICATION_METHOD_BEARER:
+                // if other auth method is desired by server return error
+                if ($method != self::AUTHENTICATION_METHOD_BEARER) {
+                    $method = $desired_method;
+                    return self::ERROR_WRONG_AUTHENTICATION_METHOD;
+                }
+                break;
+
+            default:
+                // if none of the supported methods was selected throw error
+                throw new OutOfRangeException("The selected authentication method isn't supported");
+        }
+
+        // return that everything went ok
         return 0;
     }
 
