@@ -137,7 +137,7 @@ class adapterUser implements AdapterInterface
     {
         // convert the names of representative fields to database fields
 
-        // map names together
+        // map names together (id is skipped since you can't change it anyways)
         $key_map = [
             user::KEY_NAME => db_kwd::USER_NAME,
             user::KEY_ROLE => db_kwd::USER_ROLE,
@@ -155,7 +155,7 @@ class adapterUser implements AdapterInterface
         $array_key_token_timestamp = array_search(user::KEY_BINARY_TIMESTAMP, $keys);
         if (false !== $array_key_token_timestamp) {
             // add to fields
-            $fields[] = user::KEY_BINARY_TIMESTAMP . "=? ";
+            $fields[] = $key_map[user::KEY_BINARY_TIMESTAMP] . "=? ";
             // convert to string and add to params
             $params[] = $representative->{user::KEY_BINARY_TIMESTAMP}->format("Y-m-d H:i:s");
             // remove key from array to prevent multiple addition
@@ -170,8 +170,8 @@ class adapterUser implements AdapterInterface
             if ($field != null) {
                 // add string for prepare statement
                 $fields[] = $field . "=? ";
+                
                 // add value to array (Note: use correct key)
-
                 $params[] = $representative->{$key};
             }
         }
