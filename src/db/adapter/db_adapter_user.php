@@ -92,7 +92,7 @@ class adapterUser implements AdapterInterface
     }
 
     // explained in the interface
-    public static function add(mysqli $db, array $users): array
+    public static function add(mysqli $db, array $representatives): array
     {
         // empty return array
         $return = [];
@@ -110,7 +110,7 @@ class adapterUser implements AdapterInterface
             . ") VALUES (?, ?, ?, ?, ?, ?);");
 
         // iterate through array of users and add to database
-        foreach ($users as &$user) {
+        foreach ($representatives as &$user) {
             if (!$statement->execute([
                 $user->{user::KEY_NAME},
                 $user->{user::KEY_ROLE},
