@@ -6,8 +6,14 @@ backend for liveticker written in php
 - Users
   - some additional testing about logout and logging in with bearer tokens
 - Competition
-  - all
+  - adapter
+  - representative
+  - util
+  - top-level
 - Disciplines
   - all
 - Results
   - all
+
+## Testing
+Testing is done with [VS Code](https://code.visualstudio.com/) and the [thunder client](https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client) extension.
