@@ -858,5 +858,54 @@
       }
     ],
     "docs": "thesting of logging out with bearer should be tested seperately"
+  },
+  {
+    "_id": "387800d3-7203-4097-9396-152af97a7ab7",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "logout (using bearer token)",
+    "url": "http://{{url}}/user.php?method=logout",
+    "method": "GET",
+    "sortNum": 79375,
+    "created": "2022-07-06T14:30:37.381Z",
+    "modified": "2022-07-06T14:37:55.468Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "logout",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "UmFzaG1p:0:uxFVK2wVXss9lM6u7sIspYXN0P/IXYv+CMbUCbQo7WupRof7sG84LKGCsMJo+ps/d87UH0isSG3XCdSnSlBAXw=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "401"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "AUTHENTICATION_REQUIRED"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ],
+    "docs": "you need to change the bearer token everytime, and also view entries in database directly to know wethet the token did changed as expected."
   }
 ]
