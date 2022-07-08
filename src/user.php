@@ -147,6 +147,8 @@ switch ($param_method) {
             die(errors::to_error_string([errors::MISSING_INFORMATION], true));
         }
 
+        // Note: even though the user manager supports it, we currently don't implement changing of roles
+
         //check for any errors
         if ($error != 0) {
             printf(userErrorsToString($error));
