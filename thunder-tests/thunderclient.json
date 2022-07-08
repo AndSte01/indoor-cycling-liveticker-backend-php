@@ -907,5 +907,981 @@
       }
     ],
     "docs": "you need to change the bearer token everytime, and also view entries in database directly to know wethet the token did changed as expected."
+  },
+  {
+    "_id": "fcf4dd06-2c50-4151-8e8c-1f2f7b9d4c24",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "getting competitions",
+    "url": "http://{{url}}/competition.php",
+    "method": "GET",
+    "sortNum": 10000,
+    "created": "2022-07-08T09:21:06.914Z",
+    "modified": "2022-07-08T09:21:06.914Z",
+    "headers": [],
+    "params": [],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "5092535a-2091-4c0e-a36c-7080ab1d70e1",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "getting competitions (method out of range)",
+    "url": "http://{{url}}/competition.php?method=abc",
+    "method": "GET",
+    "sortNum": 20000,
+    "created": "2022-07-08T09:21:38.833Z",
+    "modified": "2022-07-08T09:22:27.303Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "abc",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "PARAM_OUT_OF_RANGE"
+      }
+    ]
+  },
+  {
+    "_id": "32313266-f350-4107-a754-ac4831349516",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "getting competitions (id out of range)",
+    "url": "http://{{url}}/competition.php?id=0",
+    "method": "GET",
+    "sortNum": 30000,
+    "created": "2022-07-08T09:22:44.630Z",
+    "modified": "2022-07-08T09:23:23.231Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "id",
+        "value": "0",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "PARAM_OUT_OF_RANGE"
+      }
+    ]
+  },
+  {
+    "_id": "3e963799-dfbb-42f3-b2b8-294d5f2cda9f",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "getting competitions (days is NaN)",
+    "url": "http://{{url}}/competition.php?days=a",
+    "method": "GET",
+    "sortNum": 40000,
+    "created": "2022-07-08T09:23:34.881Z",
+    "modified": "2022-07-08T09:24:11.105Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "days",
+        "value": "a",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "NaN"
+      }
+    ]
+  },
+  {
+    "_id": "5381cab0-5be6-43b1-aaa7-c028406bed2a",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "getting competitions (limit is NaN)",
+    "url": "http://{{url}}/competition.php?limit=a",
+    "method": "GET",
+    "sortNum": 50000,
+    "created": "2022-07-08T09:24:16.091Z",
+    "modified": "2022-07-08T09:24:37.916Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "limit",
+        "value": "a",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "NaN"
+      }
+    ]
+  },
+  {
+    "_id": "8cf1a5b1-85fb-4dad-8eae-25fb71e24a80",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "getting competitions (id is NaN)",
+    "url": "http://{{url}}/competition.php?id=a",
+    "method": "GET",
+    "sortNum": 35000,
+    "created": "2022-07-08T09:24:42.312Z",
+    "modified": "2022-07-08T09:25:07.734Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "id",
+        "value": "a",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "NaN"
+      }
+    ]
+  },
+  {
+    "_id": "c5b89b3a-f120-483e-ac7c-4a8d941664fa",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "adding competition",
+    "url": "http://{{url}}/competition.php?method=add",
+    "method": "POST",
+    "sortNum": 5000,
+    "created": "2022-07-08T09:26:32.462Z",
+    "modified": "2022-07-08T10:11:53.145Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "add",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n   \"date\":\"2021-11-01\",\n   \"name\":\"Demo Competition 1\",\n   \"location\":\"Demo Location\",\n   \"areas\":0,\n   \"feature_set\":4,\n   \"live\":true\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "UmFzaG1p:0:bFx+wvdbpD7wXvsEULqLqjn0fZu18IDAJj948MRVK7PpcKYHFklHSa1hut1EePn0ifjioNgO/lwSVK1cv0J/3w=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "7b4c8871-ac0e-47a5-9678-e88e2638f445",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "adding competition (already existing, all fields)",
+    "url": "http://{{url}}/competition.php?method=add",
+    "method": "POST",
+    "sortNum": 7500,
+    "created": "2022-07-08T09:33:28.508Z",
+    "modified": "2022-07-08T10:01:08.575Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "add",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n   \"date\":\"2021-11-01\",\n   \"name\":\"Demo Competition 1\",\n   \"location\":\"Demo Location\",\n   \"areas\":0,\n   \"feature_set\":4,\n   \"live\":true\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "UmFzaG1p:0:bFx+wvdbpD7wXvsEULqLqjn0fZu18IDAJj948MRVK7PpcKYHFklHSa1hut1EePn0ifjioNgO/lwSVK1cv0J/3w=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "ALREADY_EXISTS"
+      }
+    ]
+  },
+  {
+    "_id": "6815e8b4-9dd3-4a91-a40a-b5830c32f3b0",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "adding competition (invalid JSON)",
+    "url": "http://{{url}}/competition.php?method=add",
+    "method": "POST",
+    "sortNum": 8750,
+    "created": "2022-07-08T09:45:39.787Z",
+    "modified": "2022-07-08T10:01:10.899Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "add",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n   \"\"date\":\"2021-11-01\",\n   \"name\":\"Demo Competition 1\",\n   \"location\":\"Demo Location\",\n   \"areas\":0,\n   \"feature_set\":4,\n   \"live\":true\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "UmFzaG1p:0:bFx+wvdbpD7wXvsEULqLqjn0fZu18IDAJj948MRVK7PpcKYHFklHSa1hut1EePn0ifjioNgO/lwSVK1cv0J/3w=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "INVALID_JSON"
+      }
+    ]
+  },
+  {
+    "_id": "63b7da87-a61f-415d-9423-c3e1cbec096a",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "getting competitions (limit = 1)",
+    "url": "http://{{url}}/competition.php?limit=1",
+    "method": "GET",
+    "sortNum": 15000,
+    "created": "2022-07-08T09:49:12.991Z",
+    "modified": "2022-07-08T09:59:31.253Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "limit",
+        "value": "1",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "json-query",
+        "custom": "json.",
+        "action": "count",
+        "value": "1"
+      }
+    ]
+  },
+  {
+    "_id": "15f4a845-f343-4ff8-966c-db8a419cacb4",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "getting competitions (id = 1)",
+    "url": "http://{{url}}/competition.php?id=1",
+    "method": "GET",
+    "sortNum": 17500,
+    "created": "2022-07-08T09:59:44.412Z",
+    "modified": "2022-07-08T10:00:25.996Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "id",
+        "value": "1",
+        "isPath": false
+      }
+    ],
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "json-query",
+        "custom": "json.id",
+        "action": "equal",
+        "value": "1"
+      }
+    ]
+  },
+  {
+    "_id": "40e51fea-2ab9-4cc1-9bb1-b4f417921eda",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "removing competition",
+    "url": "http://{{url}}/competition.php?method=remove&id=1",
+    "method": "GET",
+    "sortNum": 120000,
+    "created": "2022-07-08T10:00:56.344Z",
+    "modified": "2022-07-08T10:38:37.959Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "remove",
+        "isPath": false
+      },
+      {
+        "name": "id",
+        "value": "1",
+        "isPath": false
+      }
+    ],
+    "auth": {
+      "type": "bearer",
+      "bearer": "UmFzaG1p:0:bFx+wvdbpD7wXvsEULqLqjn0fZu18IDAJj948MRVK7PpcKYHFklHSa1hut1EePn0ifjioNgO/lwSVK1cv0J/3w=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "SUCCESS"
+      }
+    ]
+  },
+  {
+    "_id": "db6a790f-c4e5-4461-8575-881f3742121c",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "removing competition (no/empty id)",
+    "url": "http://{{url}}/competition.php?method=remove&id",
+    "method": "GET",
+    "sortNum": 110000,
+    "created": "2022-07-08T10:17:09.139Z",
+    "modified": "2022-07-08T10:19:49.865Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "remove",
+        "isPath": false
+      },
+      {
+        "name": "id",
+        "value": "",
+        "isPath": false
+      }
+    ],
+    "auth": {
+      "type": "bearer",
+      "bearer": "UmFzaG1p:0:bFx+wvdbpD7wXvsEULqLqjn0fZu18IDAJj948MRVK7PpcKYHFklHSa1hut1EePn0ifjioNgO/lwSVK1cv0J/3w=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "MISSING_INFORMATION"
+      }
+    ]
+  },
+  {
+    "_id": "af3a157b-7d48-41da-8129-da128d699af1",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "removing competition (not existing)",
+    "url": "http://{{url}}/competition.php?method=remove&id=1",
+    "method": "GET",
+    "sortNum": 130000,
+    "created": "2022-07-08T10:19:54.852Z",
+    "modified": "2022-07-08T10:21:17.876Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "remove",
+        "isPath": false
+      },
+      {
+        "name": "id",
+        "value": "1",
+        "isPath": false
+      }
+    ],
+    "auth": {
+      "type": "bearer",
+      "bearer": "UmFzaG1p:0:bFx+wvdbpD7wXvsEULqLqjn0fZu18IDAJj948MRVK7PpcKYHFklHSa1hut1EePn0ifjioNgO/lwSVK1cv0J/3w=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "NOT_EXISTING"
+      }
+    ]
+  },
+  {
+    "_id": "3e47c216-ee52-4cea-aabf-234dd1004cbe",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "add user 2",
+    "url": "http://{{url}}/user.php?method=add",
+    "method": "POST",
+    "sortNum": 55000,
+    "created": "2022-07-08T10:26:06.309Z",
+    "modified": "2022-07-08T10:27:27.299Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "add",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Jarka\",\n    \"password\": \"Gust\"\n}",
+      "form": []
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "SUCCESS"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "33623e17-2553-48d9-82e3-152a1d803290",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "remove user 2",
+    "url": "http://{{url}}/user.php?method=remove",
+    "method": "GET",
+    "sortNum": 100000,
+    "created": "2022-07-08T10:26:23.168Z",
+    "modified": "2022-07-08T10:27:42.278Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "remove",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "Jarka",
+        "password": "Gust"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "SUCCESS"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      }
+    ]
+  },
+  {
+    "_id": "08557d20-41e9-4808-814f-c07433745a62",
+    "colId": "eae7d9f9-a92b-4043-8c42-548037239333",
+    "containerId": "",
+    "name": "authenticate (user 2)",
+    "url": "http://{{url}}/user.php",
+    "method": "GET",
+    "sortNum": 78125,
+    "created": "2022-07-08T10:28:51.137Z",
+    "modified": "2022-07-08T10:29:15.191Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n    \"name\": \"Rashmi\",\n    \"password\": \"Sonam\"\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "basic",
+      "basic": {
+        "username": "Jarka",
+        "password": "Gust"
+      }
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "UmFzaG1p:0:"
+      }
+    ]
+  },
+  {
+    "_id": "5470cacf-6f4f-4f5d-b484-f3b4e369b7fd",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "edit competition (no id)",
+    "url": "http://{{url}}/competition.php?method=edit",
+    "method": "POST",
+    "sortNum": 80000,
+    "created": "2022-07-08T10:30:02.603Z",
+    "modified": "2022-07-08T10:39:30.794Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "edit",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n   \"date\":\"2021-11-01\",\n   \"name\":\"Demo Competition 1\",\n   \"location\":\"Demo Location\",\n   \"areas\":0,\n   \"feature_set\":4,\n   \"live\":true\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "UmFzaG1p:0:bFx+wvdbpD7wXvsEULqLqjn0fZu18IDAJj948MRVK7PpcKYHFklHSa1hut1EePn0ifjioNgO/lwSVK1cv0J/3w=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "MISSING_INFORMATION"
+      }
+    ]
+  },
+  {
+    "_id": "930be87f-bd0d-4556-bfd7-06ba1df323c4",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "edit competition",
+    "url": "http://{{url}}/competition.php?method=edit&id=1",
+    "method": "POST",
+    "sortNum": 95000,
+    "created": "2022-07-08T10:39:10.707Z",
+    "modified": "2022-07-08T11:08:10.869Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "edit",
+        "isPath": false
+      },
+      {
+        "name": "id",
+        "value": "1",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n   \"date\": \"2021-11-01\",\n   \"name\": \"Demo Competition edited\",\n   \"location\": \"Demo Location edited\",\n   \"areas\": 1,\n   \"feature_set\": 0,\n   \"live\": false\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "UmFzaG1p:0:bFx+wvdbpD7wXvsEULqLqjn0fZu18IDAJj948MRVK7PpcKYHFklHSa1hut1EePn0ifjioNgO/lwSVK1cv0J/3w=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "200"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "SUCCESS"
+      }
+    ]
+  },
+  {
+    "_id": "009c350a-ba90-4179-a23e-68be9be26dcf",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "edit competition (not existing)",
+    "url": "http://{{url}}/competition.php?method=edit&id=5000",
+    "method": "POST",
+    "sortNum": 87500,
+    "created": "2022-07-08T10:53:13.149Z",
+    "modified": "2022-07-08T11:02:11.601Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "edit",
+        "isPath": false
+      },
+      {
+        "name": "id",
+        "value": "5000",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n   \"date\":\"2021-11-01\",\n   \"name\":\"Demo Competition 1\",\n   \"location\":\"Demo Location\",\n   \"areas\":0,\n   \"feature_set\":4,\n   \"live\":true\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "UmFzaG1p:0:bFx+wvdbpD7wXvsEULqLqjn0fZu18IDAJj948MRVK7PpcKYHFklHSa1hut1EePn0ifjioNgO/lwSVK1cv0J/3w=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "NOT_EXISTING"
+      }
+    ]
+  },
+  {
+    "_id": "0de76aeb-0ba9-4022-b9d0-8702dcf5a77e",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "edit competition (no access)",
+    "url": "http://{{url}}/competition.php?method=edit&id=1",
+    "method": "POST",
+    "sortNum": 91250,
+    "created": "2022-07-08T11:00:45.992Z",
+    "modified": "2022-07-08T11:02:28.530Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "edit",
+        "isPath": false
+      },
+      {
+        "name": "id",
+        "value": "1",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n   \"date\":\"2021-11-01\",\n   \"name\":\"Demo Competition 1\",\n   \"location\":\"Demo Location\",\n   \"areas\":0,\n   \"feature_set\":4,\n   \"live\":true\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "SmFya2E=:0:8BfNP3HwDiWycJGAP8o0yc4xv7qteUldvzwtTbzy4788i75zRcWN2Jfz7o5ruBgVkBLueIN3S+CBGbT7gKjsyg=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "ACCESS_DENIED"
+      }
+    ]
+  },
+  {
+    "_id": "8a94bcd0-b0ea-4130-abab-6f7acc232939",
+    "colId": "c29e5cdc-8067-4f50-9507-9cf740c376f7",
+    "containerId": "",
+    "name": "edit competition (id is NaN)",
+    "url": "http://{{url}}/competition.php?method=edit&id=a",
+    "method": "POST",
+    "sortNum": 83750,
+    "created": "2022-07-08T11:06:52.905Z",
+    "modified": "2022-07-08T11:07:17.544Z",
+    "headers": [],
+    "params": [
+      {
+        "name": "method",
+        "value": "edit",
+        "isPath": false
+      },
+      {
+        "name": "id",
+        "value": "a",
+        "isPath": false
+      }
+    ],
+    "body": {
+      "type": "json",
+      "raw": "{\n   \"date\":\"2021-11-01\",\n   \"name\":\"Demo Competition 1\",\n   \"location\":\"Demo Location\",\n   \"areas\":0,\n   \"feature_set\":4,\n   \"live\":true\n}",
+      "form": []
+    },
+    "auth": {
+      "type": "bearer",
+      "bearer": "UmFzaG1p:0:bFx+wvdbpD7wXvsEULqLqjn0fZu18IDAJj948MRVK7PpcKYHFklHSa1hut1EePn0ifjioNgO/lwSVK1cv0J/3w=="
+    },
+    "tests": [
+      {
+        "type": "res-code",
+        "custom": "",
+        "action": "equal",
+        "value": "400"
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "isjson",
+        "value": ""
+      },
+      {
+        "type": "res-body",
+        "custom": "",
+        "action": "contains",
+        "value": "NaN"
+      }
+    ]
   }
 ]
