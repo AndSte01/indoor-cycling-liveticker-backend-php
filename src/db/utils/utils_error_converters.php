@@ -12,11 +12,13 @@ namespace db\utils;
 // define aliases
 use errors;
 use managerAuthentication;
+use managerCompetition;
 use managerUser;
 
 // import required filed
 require_once(dirname(__FILE__) . "/../managers/manager_authentication.php");
 require_once(dirname(__FILE__) . "/../managers/manager_user.php");
+require_once(dirname(__FILE__) . "/../managers/manager_competition.php");
 require_once(dirname(__FILE__) . "/../../errors.php");
 
 /**
@@ -93,5 +95,36 @@ function userErrorsToString(int $error,  bool $prepareDie = false): string
 
         default:
             return errors::to_error_string([]);
+    }
+}
+
+/**
+ * Converts competition errors to a string of errors defined in errors.php
+ * 
+ * @param int $error the error from managerCompetition
+ * @param bool $prepareDie Prepares the header for immediate call of die() afterwards
+ * 
+ * @return string the errors as a string
+ */
+function competitionErrorsToString(int $error, bool $prepareDie = false): string
+{
+    switch ($error) {
+        case managerCompetition::ERROR_ALREADY_EXISTING:
+            return errors::to_error_string([errors::ALREADY_EXISTS], $prepareDie);
+
+        case managerCompetition::ERROR_MISSING_INFORMATION:
+            return errors::to_error_string([errors::MISSING_INFORMATION], $prepareDie);
+
+        case managerCompetition::ERROR_NOT_EXISTING:
+            return errors::to_error_string([errors::NOT_EXISTING], $prepareDie);
+
+        case managerCompetition::ERROR_OUT_OF_RANGE:
+            return errors::to_error_string([errors::PARAM_OUT_OF_RANGE], $prepareDie);
+
+        case managerCompetition::ERROR_WRONG_USER_ID:
+            return errors::to_error_string([errors::ACCESS_DENIED], $prepareDie);
+
+        default:
+            return errors::to_error_string([errors::SUCCESS]);
     }
 }
