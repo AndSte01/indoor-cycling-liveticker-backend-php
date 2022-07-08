@@ -120,72 +120,6 @@ class competition implements JsonSerializable, RepresentativeChildInterface
         $this->data[self::KEY_USER] = $ID;
     }
 
-    // explained in RepresentativeInterface
-    public function makeDbReady(mysqli $db): int
-    {
-        // variable for error messages
-        $error = 0;
-
-        // check date
-        if ($this->{self::KEY_DATE} == null) {
-            $this->data[self::KEY_DATE] = new DateTime();
-            $error |= self::ERROR_DATE;
-        }
-
-        // check if invalid characters are present in string, if so remove them and add error
-        if (strcmp($this->{self::KEY_NAME}, $db->real_escape_string($this->{self::KEY_NAME})) != 0) {
-            $this->date[self::KEY_NAME] = $db->real_escape_string($this->{self::KEY_NAME});
-            $error |= self::ERROR_NAME;
-        }
-
-        if (strcmp($this->{self::KEY_LOCATION}, $db->real_escape_string($this->{self::KEY_LOCATION})) != 0) {
-            $this->date[self::KEY_LOCATION] = $db->real_escape_string($this->{self::KEY_LOCATION});
-            $error |= self::ERROR_LOCATION;
-        }
-
-        // check if integers are within their correct range, if not make them 0 and add error
-        // won't check id, it isn't used when writing to db and if reading from db and id is out of range nothing happens
-        // user id can't be smaller than 1 (max. value is due to db limitations)
-        if ($this->{self::KEY_USER} < 1 || $this->{self::KEY_USER} > 2147483647) {
-            $this->data[self::KEY_USER] = 0; // marks competition as obviously wrong in database
-            $error |= self::ERROR_USER;
-        }
-
-        // areas are >= 0 by definition
-        if ($this->{self::KEY_AREAS} < 0) {
-            $this->data[self::KEY_AREAS] = 0;
-            $error |= self::ERROR_AREAS;
-        }
-        if ($this->{self::KEY_AREAS} > 127) {
-            $this->data[self::KEY_AREAS] = 127;
-            $error |= self::ERROR_AREAS;
-        }
-
-        // feature_set is >= 0 by design (values >127 are also invalid so downgrade to 0 happens)
-        if ($this->{self::KEY_FEATURE_SET} < 0 || $this->{self::KEY_FEATURE_SET} > 127) {
-            $this->data[self::KEY_FEATURE_SET] = 0;
-            $error |= self::ERROR_FEATURE_SET;
-        }
-
-        // live is seen as a boolean (so make it one)
-        // 0 for everything < 0
-        if ($this->{self::KEY_LIVE} < 0) {
-            $this->data[self::KEY_LIVE] = 0;
-            $error |= self::ERROR_LIVE;
-        }
-        // 1 for everything > 1
-        if ($this->{self::KEY_LIVE} > 1) {
-            $this->data[self::KEY_LIVE] = 1;
-            $error |= self::ERROR_LIVE;
-        }
-
-        // mark competition as ready for database
-        $this->isDbReady = true;
-
-        // return errors
-        return $error;
-    }
-
     /**
      * Parse strings into the competition
      * NO CHECKS ARE DONE WETHER THE VALUES ARE USEFUL OR NOT, JUST TYPE-SAFETY.
@@ -213,9 +147,6 @@ class competition implements JsonSerializable, RepresentativeChildInterface
         ?string $live = "",
         ?mysqli $db = null
     ): int {
-        // after parsing no competition isDbReady
-        $this->isDbReady = false;
-
         // variable for error
         $error = 0;
 
@@ -239,10 +170,6 @@ class competition implements JsonSerializable, RepresentativeChildInterface
         $this->data[self::KEY_FEATURE_SET] = intval($feature_set);
         $this->data[self::KEY_LIVE] = intval($live);
 
-        // if a $db is passed also run makeDbReady()
-        if ($db != null)
-            $error = $error | $this->makeDbReady($db); // add errors together
-
         // return errors
         return $error;
     }
@@ -256,7 +183,7 @@ class competition implements JsonSerializable, RepresentativeChildInterface
     {
         return [
             self::KEY_ID => $this->{self::KEY_ID},
-            self::KEY_DATE => $this->{self::KEY_DATE}->format('Y-m-d'),
+            self::KEY_DATE => $this->{self::KEY_DATE}->format("Y-m-d"),
             self::KEY_NAME => $this->{self::KEY_NAME},
             self::KEY_LOCATION => $this->{self::KEY_LOCATION},
             self::KEY_AREAS => $this->{self::KEY_AREAS},

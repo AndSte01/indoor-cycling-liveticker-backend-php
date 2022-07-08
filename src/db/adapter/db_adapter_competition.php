@@ -160,7 +160,7 @@ class adapterCompetition implements AdapterInterface
      * Note: you can't add a competition where user_id is null,
      * it gets prevented even though the database would alow for it.
      */
-    public static function add(mysqli $db, array $competitions): array
+    public static function add(mysqli $db, array $representatives): array
     {
         // empty return array
         $return = [];
@@ -191,8 +191,8 @@ class adapterCompetition implements AdapterInterface
         );
 
         // iterate through array of competitions and add to database
-        foreach ($competitions as &$competition) {
-            $comp_date = $competition->{competition::KEY_DATE}->format('Y-m-d');
+        foreach ($representatives as &$competition) {
+            $comp_date = $competition->{competition::KEY_DATE}->format("Y-m-d");
             $comp_name = $competition->{competition::KEY_NAME};
             $comp_location = $competition->{competition::KEY_LOCATION};
             $comp_user = $competition->{competition::KEY_USER};
@@ -219,62 +219,159 @@ class adapterCompetition implements AdapterInterface
     }
 
     // explained in the interface
-    public static function edit(mysqli $db, array $competitions): void
+    public static function edit(mysqli $db, RepresentativeInterface $representative, array $keys): void
     {
-        $statement = $db->prepare("UPDATE " . db_config::TABLE_COMPETITION . " SET " .
-            implode(", ", [
-                db_kwd::COMPETITION_DATE . " = ?",
-                db_kwd::COMPETITION_NAME . " = ?",
-                db_kwd::COMPETITION_LOCATION . " = ?",
-                db_kwd::COMPETITION_USER . " = ?",
-                db_kwd::COMPETITION_AREAS . " = ?",
-                db_kwd::COMPETITION_FEATURE_SET . " = ?",
-                db_kwd::COMPETITION_LIVE . " = ?"
-            ])
-            . " WHERE " . db_kwd::COMPETITION_ID . " = ?");
+        // convert the names of representative fields to database fields
 
-        // bind parameters to statement
-        $statement->bind_param(
-            "ssssiiii",
-            $comp_date,
-            $comp_name,
-            $comp_location,
-            $comp_user,
-            $comp_areas,
-            $comp_feature_set,
-            $comp_live,
-            $comp_id
-        );
+        // map names together (id and user are  since you can't change them anyways)
+        $key_map = [
+            competition::KEY_DATE => db_kwd::COMPETITION_DATE,
+            competition::KEY_NAME => db_kwd::COMPETITION_NAME,
+            competition::KEY_LOCATION => db_kwd::COMPETITION_LOCATION,
+            competition::KEY_AREAS => db_kwd::COMPETITION_AREAS,
+            competition::KEY_FEATURE_SET => db_kwd::COMPETITION_FEATURE_SET,
+            competition::KEY_LIVE => db_kwd::COMPETITION_LIVE
+        ];
 
-        // iterate through array of competitions and add to database
-        foreach ($competitions as &$competition) {
-            $comp_id = $competition->{competition::KEY_ID};
-            $comp_date = $competition->{competition::KEY_DATE}->format('Y-m-d');
-            $comp_name = $competition->{competition::KEY_NAME};
-            $comp_location = $competition->{competition::KEY_LOCATION};
-            $comp_user = $competition->{competition::KEY_USER};
-            $comp_areas = $competition->{competition::KEY_AREAS};
-            $comp_feature_set = $competition->{competition::KEY_FEATURE_SET};
-            $comp_live = $competition->{competition::KEY_LIVE};
+        // empty arrays to hold fields that should be updated
+        $fields = []; // field names in database containing an additional =? for sql query
+        $params = []; // values to insert in database
 
-            if (!$statement->execute()) {
-                error_log("error while updating competition in database");
+        // treat DateTime object separately
+        $array_key_date = array_search(competition::KEY_DATE, $keys);
+        if (false !== $array_key_date) {
+            // add to fields
+            $fields[] = $key_map[competition::KEY_DATE] . "=? ";
+            // convert to string and add to params
+            $params[] = $representative->{competition::KEY_DATE}->format("Y-m-d");
+            // remove key from array to prevent multiple addition
+            unset($keys[$array_key_date]);
+        }
+
+        foreach ($keys as $key) {
+            // get mapped key (might be null if fields contained unsupported key)
+            $field = $key_map[$key];
+
+            // add field to update list
+            if ($field != null) {
+                // add string for prepare statement
+                $fields[] = $field . "=? ";
+
+                // add value to array (Note: use correct key)
+                $params[] = $representative->{$key};
             }
         }
+
+        // add id as last value to params
+        $params[] = $representative->{user::KEY_ID};
+
+        // use prepared statement to prevent SQL injections
+        $statement = $db->prepare("UPDATE " . db_config::TABLE_COMPETITION . " SET " .
+            implode(", ", $fields)
+            . " WHERE " . db_kwd::COMPETITION_ID . "=?");
+
+
+        // execute statement with prepared values
+        $statement->execute($params);
     }
 
     // explained in the interface
-    public static function remove(mysqli $db, array $competitions): void
+    public static function remove(mysqli $db, array $representatives): void
     {
         // prepare statement
         $statement = $db->prepare("DELETE FROM " . db_config::TABLE_COMPETITION . " WHERE " . db_kwd::COMPETITION_ID . " = ?");
         $statement->bind_param("i", $ID);
 
         // iterate through array and execute statement for different ids
-        foreach ($competitions as &$competition) {
+        foreach ($representatives as &$competition) {
             $ID = $competition->{competition::KEY_ID};
             $statement->execute();
         }
+    }
+
+    // explained int the interface
+    public static function makeRepresentativeDbReady(mysqli $db, RepresentativeInterface &$representative): int
+    {
+        // variable for storing errors
+        $error = 0;
+
+        // get values from old representative
+        $old_id = $representative->{competition::KEY_ID};
+        $new_date = $representative->{competition::KEY_DATE};
+        $new_name = $representative->{competition::KEY_NAME};
+        $new_location = $representative->{competition::KEY_LOCATION};
+        $new_user = $representative->{competition::KEY_USER};
+        $new_areas = $representative->{competition::KEY_AREAS};
+        $new_feature_set = $representative->{competition::KEY_FEATURE_SET};
+        $new_live = $representative->{competition::KEY_LIVE};
+
+        // check date
+        if ($new_date == null) {
+            $new_date = new DateTime();
+            $error |= competition::ERROR_DATE;
+        }
+
+        // check if invalid characters are present in string, if so remove them and add error
+        if (strcmp($new_name, $db->real_escape_string($new_name)) != 0) {
+            $new_name = $db->real_escape_string($new_name);
+            $error |= competition::ERROR_NAME;
+        }
+
+        if (strcmp($new_location, $db->real_escape_string($new_location)) != 0) {
+            $new_location = $db->real_escape_string($new_location);
+            $error |= competition::ERROR_LOCATION;
+        }
+
+        // check if integers are within their correct range, if not make them 0 and add error
+        // won't check id, it isn't used when writing to db and if reading from db and id is out of range nothing happens
+        // user id can't be smaller than 1 (max. value is due to db limitations)
+        if ($new_user < 1 || $new_user > 2147483647) {
+            $new_user = 0; // marks competition as user less in database
+            $error |= competition::ERROR_USER;
+        }
+
+        // areas are >= 0 by definition
+        if ($new_areas < 0) {
+            $new_areas = 0;
+            $error |= competition::ERROR_AREAS;
+        }
+        if ($new_areas > 127) {
+            $new_areas = 127;
+            $error |= competition::ERROR_AREAS;
+        }
+
+        // feature_set is >= 0 by design (values >127 are also invalid so downgrade to 0 happens)
+        if ($new_feature_set < 0 || $new_feature_set > 127) {
+            $new_feature_set = 0;
+            $error |= competition::ERROR_FEATURE_SET;
+        }
+
+        // live is seen as a boolean (so make it one)
+        // 0 for everything < 0
+        if ($new_live < 0) {
+            $new_live = 0;
+            $error |= competition::ERROR_LIVE;
+        }
+        // 1 for everything > 1
+        if ($new_live > 1) {
+            $new_live = 1;
+            $error |= competition::ERROR_LIVE;
+        }
+
+        // overwrite competition wih new one
+        $representative = new competition(
+            $old_id,
+            $new_date,
+            $new_name,
+            $new_location,
+            $new_user,
+            $new_areas,
+            $new_feature_set,
+            $new_live
+        );
+
+        // return possible errors
+        return $error;
     }
 
     /**
@@ -286,6 +383,8 @@ class adapterCompetition implements AdapterInterface
      */
     public static function clean(mysqli $db): bool|int
     {
+        // function is still required since a competition gets user NULL assigned if user got deleted (used to prevent data loss)
+
         // no prepared statement is needed
         // remove all competitions where the user_id is null
         $result = $db->query("DELETE FROM "  . db_config::TABLE_COMPETITION . " WHERE " . db_kwd::COMPETITION_USER . " = NULL");

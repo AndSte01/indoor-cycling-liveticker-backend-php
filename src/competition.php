@@ -32,11 +32,10 @@ const GET_COMPETITIONS_LIMIT_MAX = 100;
 // error_reporting(E_ALL);
 
 // import required files
-require_once("db/managers/db_managers_authentication.php");
-require_once("db/managers/db_managers_user.php");
-require_once("db/managers/db_managers_competition.php");
-require_once("db/utils/db_utils_competition.php");
-require_once("db/utils/db_utils_authentication.php");
+require_once("db/managers/manager_authentication.php");
+require_once("db/managers/manager_user.php");
+require_once("db/managers/manager_competition.php");
+require_once("db/utils/utils_error_converters.php");
 
 // realm for authentication
 $realm = "global";
@@ -83,29 +82,52 @@ $user_manager = new managerUser($db);
 $authentication_manager = new managerAuthentication($user_manager, $realm);
 
 // initiated login routine
-$result = $authentication_manager->initiateLoginRoutine();
+$authentication_result = $authentication_manager->authenticate(managerAuthentication::AUTHENTICATION_METHOD_BEARER, 0);
 
 // check if login was successful, else die with error as string
-if ($result != 0) {
+if ($authentication_result != 0) {
     printf(authenticationErrorsToString($result));
     $db->close();
     exit();
 }
 
+// check the id parameter in case the user wants to edit or remove the competition
+if (in_array($param_method, ["edit", "remove"])) {
+    // check if id is provided and wether it is an int or not
+    if ($param_id == null) {
+        printf(errors::to_error_string([errors::MISSING_INFORMATION], true));
+        $db->close();
+        exit();
+    }
+    if (filter_var($param_id, FILTER_VALIDATE_INT) === false) {
+        printf(errors::to_error_string([errors::NaN], true));
+        $db->close();
+        exit();
+    }
+}
+
 // decide what the user want's todo
 switch ($param_method) {
     case "add":
-        printf(parseVerifyModifyCompetition($json, 0, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        printf(parseVerifyModifyCompetition($json, 0, $authentication_manager->getCurrentUser()->{user::KEY_ID}, 0, $db));
         $db->close();
         exit();
 
     case "edit":
-        printf(parseVerifyModifyCompetition($json, 1, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        printf(parseVerifyModifyCompetition($json, 1, $authentication_manager->getCurrentUser()->{user::KEY_ID}, intval($param_id), $db));
         $db->close();
         exit();
 
     case "remove":
-        printf(parseVerifyModifyCompetition($json, 2, $authentication_manager->getCurrentUser()->{user::KEY_ID}, $db));
+        // this is done here since parseVerifyModifyCompetition would require a json send by client
+        $competition_manager = new managerCompetition($db);
+        $competition_manager->setCurrentUserId($authentication_manager->getCurrentUser()->{user::KEY_ID});
+
+        $temp_competition = new competition();
+        $temp_competition->parse($param_id);
+
+        printf(competitionErrorsToString($competition_manager->remove($temp_competition, true), true));
+
         $db->close();
         exit();
 
@@ -219,13 +241,14 @@ function getCompetitionsId($id): string
  * Adds, edits or removes a competitions to/from database
  * 
  * @param string $json JSON representation of the competition to work with
- * @param int $action 0 = try to add the competition, 1 = try to edit the given competition, 2 = remove competition
+ * @param int $action 0 = try to add the competition, 1 = try to edit the given competition
  * @param int $userId The user id to work with
+ * @param int $competition_id The id of the competition, only required when editing competition
  * @param mysqli $db The database to work with
  * 
  * @return string String ready for sending to client
  */
-function parseVerifyModifyCompetition(string $json, int $action, int $userId, mysqli $db): string
+function parseVerifyModifyCompetition(string $json, int $action, int $userId, int $competition_id = 0, mysqli $db): string
 {
     // decode json to assoc array
     $decoded = json_decode($json, true);
@@ -237,7 +260,7 @@ function parseVerifyModifyCompetition(string $json, int $action, int $userId, my
     // create empty competition to parse data to
     $competition = new competition();
     $competition->parse(
-        strval($decoded[competition::KEY_ID]),
+        strval($competition_id),
         strval($decoded[competition::KEY_DATE]),
         strval($decoded[competition::KEY_NAME]),
         strval($decoded[competition::KEY_LOCATION]),
@@ -261,17 +284,17 @@ function parseVerifyModifyCompetition(string $json, int $action, int $userId, my
 
             // do error handling
             if (is_int($result))
-                return competitionErrorsToString($result);
+                return competitionErrorsToString($result, true);
 
             // if no error ocurred return competition (in $result) as json
             return json_encode($result, JSON_UNESCAPED_UNICODE);
 
         case 1: // edit
-            $result = $competition_manager->edit($competition);
-            return competitionErrorsToString($result);
+            $result = $competition_manager->edit($competition, array_keys($decoded));
+            return competitionErrorsToString($result, true);
 
-        case 2: // remove
+            /*case 2: // remove
             $result = $competition_manager->remove($competition);
-            return competitionErrorsToString($result);
+            return competitionErrorsToString($result, true);*/
     }
 }
