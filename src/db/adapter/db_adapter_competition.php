@@ -219,7 +219,7 @@ class adapterCompetition implements AdapterInterface
     }
 
     // explained in the interface
-    public static function edit(mysqli $db, RepresentativeInterface $representative, array $keys): void
+    public static function edit(mysqli $db, RepresentativeInterface $representative, array $keys): bool
     {
         // convert the names of representative fields to database fields
 
@@ -272,7 +272,7 @@ class adapterCompetition implements AdapterInterface
 
 
         // execute statement with prepared values
-        $statement->execute($params);
+        return $statement->execute($params);
     }
 
     // explained in the interface
