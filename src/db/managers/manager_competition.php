@@ -198,7 +198,7 @@ class managerCompetition
      * Note: the user id in the passed competition is irrelevant, the id in set with setCurrentUserId() is used!
      * 
      * @param competition $competition The competition to edit in the database, with the currently set user.
-     * @param array $keys The fields of the competition to update
+     * @param array $fields The fields of the competition to update
      * 
      * @return int Errors that happened during execution
      */
