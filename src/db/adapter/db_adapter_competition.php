@@ -263,7 +263,7 @@ class adapterCompetition implements AdapterInterface
         }
 
         // add id as last value to params
-        $params[] = $representative->{user::KEY_ID};
+        $params[] = $representative->{competition::KEY_ID};
 
         // use prepared statement to prevent SQL injections
         $statement = $db->prepare("UPDATE " . db_config::TABLE_COMPETITION . " SET " .
