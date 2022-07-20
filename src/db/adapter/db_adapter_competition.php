@@ -59,7 +59,7 @@ class adapterCompetition implements AdapterInterface
         $parameters = [];
 
         // check if filters need to be set
-        if (($id != null)) { // also true if empty array
+        if (($id !== null)) { // also true if empty array
             $filter[] = db_kwd::COMPETITION_ID . "=?";
             $parameters[] = strval($id);
         }
