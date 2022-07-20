@@ -295,7 +295,7 @@ class managerUser
             $role,
             $password_hash,
             $salt,
-            (new DateTime())->setTimestamp(43201), // bearer timestamp (don't user null to prevent timezone issues)
+            new DateTime("@43201"), // bearer timestamp (don't use null to prevent timezone issues)
             random_bytes(db_col_prop::USER_BINARY_TOKEN_LENGTH) // new random bearer token
         );
 
@@ -344,7 +344,7 @@ class managerUser
             null,
             $password_hash,
             $salt,
-            (new DateTime())->setTimestamp(43201), // bearer timestamp (don't user null to prevent timezone issues)
+            new DateTime("@43201"), // bearer timestamp (don't use null to prevent timezone issues)
             random_bytes(db_col_prop::USER_BINARY_TOKEN_LENGTH) // new random bearer token
         );
 
@@ -394,7 +394,7 @@ class managerUser
             $role,
             null,
             null,
-            (new DateTime())->setTimestamp(43201), // bearer timestamp (don't user null to prevent timezone issues)
+            new DateTime("@43201"), // bearer timestamp (don't use null to prevent timezone issues)
             random_bytes(db_col_prop::USER_BINARY_TOKEN_LENGTH) // new random bearer token
         );
 

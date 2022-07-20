@@ -137,11 +137,11 @@ class user implements JsonSerializable, RepresentativeInterface
                 $this->data[self::KEY_BINARY_TIMESTAMP] = new DateTime($bearer_timestamp);
             } catch (\Exception $e) {
                 error_log($e);
-                $this->data[self::KEY_BINARY_TIMESTAMP] = (new DateTime())->setTimestamp(43201); // set it close to unix 0 (but not exactly to prevent timezone issues)
+                $this->data[self::KEY_BINARY_TIMESTAMP] = new DateTime("@43201"); // set it close to unix 0 (but not exactly to prevent timezone issues)
                 $error |= self::ERROR_BINARY_TIMESTAMP;
             }
         } else {
-            $this->data[self::KEY_BINARY_TIMESTAMP] = (new DateTime())->setTimestamp(43201); // set it close to unix 0 (but not exactly to prevent timezone issues)
+            $this->data[self::KEY_BINARY_TIMESTAMP] = new DateTime("@43201"); // set it close to unix 0 (but not exactly to prevent timezone issues)
             $error |= self::ERROR_BINARY_TIMESTAMP;
         }
 
