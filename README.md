@@ -5,18 +5,35 @@ backend for liveticker written in php
 ## To-Do
 - Users
   - some additional testing about logout and logging in with bearer tokens
-- Competition
++ Competition [done]
   + adapter
     + coding
-    - testing
+    + testing
   + representative
     + coding
+    + testing
+  + manager
+    + code
+    + testing
+  + top-level
+    + code
+    + testing
+  - documentation
+- Disciplines
+  - adapter
+    + code
+    - testing
+  - representative
+    + code
     - testing
   - manager
-    - todo
+    + code
+    - testing
   - top-level
-- Disciplines
-  - all
+    + code
+    - test-cases
+    - testing
+  - documentation
 - Results
   - all
 
