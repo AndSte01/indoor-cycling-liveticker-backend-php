@@ -19,9 +19,9 @@ require_once("db_adapter_interface.php");
 require_once(dirname(__FILE__) . "/../representatives/db_representatives_discipline.php");
 
 // define aliases
-
 use DateTime;
 use mysqli;
+use db\utils\discipline_type;
 
 /**
  * Database adapter for disciplines
@@ -53,11 +53,11 @@ class adapterDiscipline implements adapterInterface
         $parameters = [];
 
         // check if filters need to be set
-        if (($discipline_id != null)) { // also true if empty array
+        if (($discipline_id !== null)) { // also true if empty array
             $filter[] = db_kwd::DISCIPLINE_ID . "=?";
             $parameters[]  = strval($discipline_id);
         }
-        if ($competition_id != null) {
+        if ($competition_id !== null) {
             $filter[] = db_kwd::DISCIPLINE_COMPETITION . "=?";
             $parameters[] = strval($competition_id);
         }
@@ -145,7 +145,7 @@ class adapterDiscipline implements adapterInterface
     /**
      * Note the timestamp won't be updated on returned disciplines, use search with discipline_id for that
      */
-    public static function add(mysqli $db, array $disciplines): array
+    public static function add(mysqli $db, array $representatives): array
     {
         // empty return array
         $return = [];
@@ -172,7 +172,7 @@ class adapterDiscipline implements adapterInterface
         );
 
         // iterate through array of disciplines and add to database
-        foreach ($disciplines as &$discipline) {
+        foreach ($representatives as &$discipline) {
             $discipline_competition_id = $discipline->{discipline::KEY_COMPETITION_ID};
             $discipline_type = $discipline->{discipline::KEY_TYPE};
             $discipline_fallback_name = $discipline->{discipline::KEY_FALLBACK_NAME};
@@ -194,43 +194,48 @@ class adapterDiscipline implements adapterInterface
     }
 
     // explained in the interface
-    public static function edit(mysqli $db, array $disciplines): void
+    public static function edit(mysqli $db, RepresentativeInterface $representative, array $keys): bool
     {
-        // use prepared statement to prevent SQL injections
-        $statement = $db->prepare("UPDATE " . db_config::TABLE_DISCIPLINE . " SET " .
-            implode(", ", [
-                db_kwd::DISCIPLINE_COMPETITION . "=? ",
-                db_kwd::DISCIPLINE_TYPE . "=? ",
-                db_kwd::DISCIPLINE_FALLBACK_NAME . "=? ",
-                db_kwd::DISCIPLINE_ROUND . "=? ",
-                db_kwd::DISCIPLINE_FINISHED . "=? "
-            ])
-            . " WHERE " . db_kwd::DISCIPLINE_ID . "=?");
+        // convert the names of representative fields to database fields
 
-        // bind parameters to statement
-        $statement->bind_param(
-            "iisiii",
-            $discipline_competition_id,
-            $discipline_type,
-            $discipline_fallback_name,
-            $discipline_round,
-            $discipline_finished,
-            $discipline_id
-        );
+        // map names together (id is skipped since you can't change it anyways, timestamp is because it's auto generated)
+        $key_map = [
+            discipline::KEY_COMPETITION_ID => db_kwd::DISCIPLINE_COMPETITION,
+            discipline::KEY_TYPE => db_kwd::DISCIPLINE_TYPE,
+            discipline::KEY_FALLBACK_NAME => db_kwd::DISCIPLINE_FALLBACK_NAME,
+            discipline::KEY_ROUND => db_kwd::DISCIPLINE_ROUND,
+            discipline::KEY_FINISHED => db_kwd::DISCIPLINE_FINISHED
+        ];
 
-        // iterate through array of disciplines and add to database
-        foreach ($disciplines as &$discipline) {
-            $discipline_competition_id = $discipline->{discipline::KEY_COMPETITION_ID};
-            $discipline_type = $discipline->{discipline::KEY_TYPE};
-            $discipline_fallback_name = $discipline->{discipline::KEY_FALLBACK_NAME};
-            $discipline_round = $discipline->{discipline::KEY_ROUND};
-            $discipline_finished = (int) $discipline->{discipline::KEY_FINISHED};
-            $discipline_id = $discipline->{discipline::KEY_ID};
+        // empty arrays to hold fields that should be updated
+        $fields = []; // field names in database containing an additional =? for sql query
+        $params = []; // values to insert in database
 
-            if (!$statement->execute()) {
-                error_log("error while writing discipline to database");
+        foreach ($keys as $key) {
+            // get mapped key (might be null if fields contained unsupported key)
+            $field = $key_map[$key];
+
+            // add field to update list
+            if ($field != null) {
+                // add string for prepare statement
+                $fields[] = $field . "=? ";
+
+                // add value to array (Note: use correct key)
+                $params[] = $representative->{$key};
             }
         }
+
+        // add id as last value to params
+        $params[] = $representative->{discipline::KEY_ID};
+
+        // use prepared statement to prevent SQL injections
+        $statement = $db->prepare("UPDATE " . db_config::TABLE_DISCIPLINE . " SET " .
+            implode(", ", $fields)
+            . " WHERE " . db_kwd::DISCIPLINE_ID . "=?");
+
+
+        // execute statement with prepared values
+        return $statement->execute($params);
     }
 
     // explained in the interface
@@ -245,5 +250,68 @@ class adapterDiscipline implements adapterInterface
             $ID = $discipline->{discipline::KEY_ID};
             $statement->execute();
         }
+    }
+
+    // explained int the interface
+    public static function makeRepresentativeDbReady(mysqli $db, RepresentativeInterface &$representative): int
+    {
+        // variable for storing errors
+        $error = 0;
+
+        // get values from old representative
+        $old_id = $representative->{discipline::KEY_ID};
+        $old_timestamp = $representative->{discipline::KEY_TIMESTAMP};
+        $old_competition_id = $representative->{discipline::KEY_COMPETITION_ID};
+        $new_type = $representative->{discipline::KEY_TYPE};
+        $new_fallback_name = $representative->{discipline::KEY_FALLBACK_NAME};
+        $new_round = $representative->{discipline::KEY_ROUND};
+        $new_finished = $representative->{discipline::KEY_FINISHED};
+
+        // check if invalid characters are present in string, if so remove them and add error
+        if (strcmp($new_fallback_name, $db->real_escape_string($new_fallback_name)) != 0) {
+            $new_fallback_name = $db->real_escape_string($new_fallback_name);
+            $error |= discipline::ERROR_FALLBACK_NAME;
+        }
+
+        // validate discipline type
+        if (!discipline_type::validateType($new_type)) {
+            $error |= discipline::ERROR_TYPE;
+        }
+
+        // round is greater or equal 0 by definition
+        if ($new_round < 0) {
+            $new_round = 0;
+            $error |= discipline::ERROR_ROUND;
+        }
+        if ($new_round > 255) {
+            $new_round = 255;
+            $error |= discipline::ERROR_ROUND;
+        }
+
+        // finished is seen as a boolean (so make it one)
+        // 0 for everything < 0
+        if ($new_finished < 0) {
+            $new_finished = 0;
+            $error |= competition::ERROR_LIVE;
+        }
+        // 1 for everything > 1
+        if ($new_finished > 1) {
+            $new_finished = 1;
+            $error |= competition::ERROR_LIVE;
+        }
+
+        // overwrite discipline with new one containing the newly created variables
+        $representative = new discipline(
+            $old_id,
+            $old_timestamp,
+            $old_competition_id,
+            $new_type,
+            $new_fallback_name,
+            $new_round,
+            $new_finished
+        );
+
+        // return possible errors
+        return $error;
     }
 }
