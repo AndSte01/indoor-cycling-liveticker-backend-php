@@ -24,33 +24,6 @@
         {
             "v": "1",
             "endpoint": "<<url>>/setup_db.php",
-            "name": "create tables",
-            "params": [
-                {
-                    "key": "create",
-                    "value": "",
-                    "active": true
-                }
-            ],
-            "headers": [],
-            "method": "GET",
-            "auth": {
-                "value": "",
-                "key": "",
-                "authType": "none",
-                "authActive": true,
-                "addTo": "Headers"
-            },
-            "preRequestScript": "",
-            "testScript": "// Check status code is correct\npw.test(\"Status code is correct\", ()=> {\n  pw.expect(pw.response.status).toBe(200);\n});\n\n// check for correct return\npw.test(\"Return is JSON and contains correct data\", () => {\n  pw.expect(pw.response.body[0]).toBe(\"SUCCESS\");\n})",
-            "body": {
-                "body": null,
-                "contentType": null
-            }
-        },
-        {
-            "v": "1",
-            "endpoint": "<<url>>/setup_db.php",
             "name": "drop tables",
             "params": [
                 {
@@ -67,6 +40,33 @@
                 "authType": "none",
                 "value": "",
                 "key": ""
+            },
+            "preRequestScript": "",
+            "testScript": "// Check status code is correct\npw.test(\"Status code is correct\", ()=> {\n  pw.expect(pw.response.status).toBe(200);\n});\n\n// check for correct return\npw.test(\"Return is JSON and contains correct data\", () => {\n  pw.expect(pw.response.body[0]).toBe(\"SUCCESS\");\n})",
+            "body": {
+                "body": null,
+                "contentType": null
+            }
+        },
+        {
+            "v": "1",
+            "endpoint": "<<url>>/setup_db.php",
+            "name": "create tables",
+            "params": [
+                {
+                    "key": "create",
+                    "value": "",
+                    "active": true
+                }
+            ],
+            "headers": [],
+            "method": "GET",
+            "auth": {
+                "value": "",
+                "key": "",
+                "authType": "none",
+                "authActive": true,
+                "addTo": "Headers"
             },
             "preRequestScript": "",
             "testScript": "// Check status code is correct\npw.test(\"Status code is correct\", ()=> {\n  pw.expect(pw.response.status).toBe(200);\n});\n\n// check for correct return\npw.test(\"Return is JSON and contains correct data\", () => {\n  pw.expect(pw.response.body[0]).toBe(\"SUCCESS\");\n})",
